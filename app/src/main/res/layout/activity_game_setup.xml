@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pure_dark"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/tvSetupTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CHOOSE YOUR FATE"
+        android:textColor="@color/horror_red"
+        android:textSize="46sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.1"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" android:fontFamily="@font/ghastly_panic" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvSetupTitle"
+        app:layout_constraintBottom_toTopOf="@+id/btnEnterRoom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Category Section -->
+            <TextView android:fontFamily="@font/ghastly_panic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SELECT CATEGORY"
+                android:textColor="@color/pale_white"
+                android:textSize="32sp"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioGroup
+                android:id="@+id/rgCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_horror_card"
+                android:padding="12dp"
+                android:layout_marginBottom="24dp">
+
+                <RadioButton
+                    android:id="@+id/rbAnimals"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="ANIMALS"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rbObjects"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="OBJECTS"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"/>
+
+                <RadioButton
+                    android:id="@+id/rbCelebrities"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="CELEBRITIES"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"/>
+            </RadioGroup>
+
+            <!-- Difficulty Section -->
+            <TextView android:fontFamily="@font/ghastly_panic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SELECT TARGET SACRIFICE (DIFFICULTY)"
+                android:textColor="@color/pale_white"
+                android:textSize="32sp"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioGroup
+                android:id="@+id/rgDifficulty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_horror_card"
+                android:padding="12dp"
+                android:layout_marginBottom="24dp">
+
+                <RadioButton
+                    android:id="@+id/rbEasy"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="EASY - ANIMAL SACRIFICE"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rbIntermediate"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="INTERMEDIATE - ADULT STRANGER"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"/>
+
+                <RadioButton
+                    android:id="@+id/rbHard"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="HARD - INNOCENT CHILD (PSYCHOLOGICAL DREAD)"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"/>
+            </RadioGroup>
+
+            <!-- Mode Section -->
+            <TextView android:fontFamily="@font/ghastly_panic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SELECT RITUAL MODE"
+                android:textColor="@color/pale_white"
+                android:textSize="32sp"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioGroup
+                android:id="@+id/rgMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_horror_card"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/rbClassic"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="CLASSIC (ATTEMPTS LIMIT ONLY)"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rbTimer"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="TIMER MODE (TICKING DEATH)"
+                    android:textColor="@color/white"
+                    android:buttonTint="@color/horror_red"/>
+            </RadioGroup>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnEnterRoom"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:text="ENTER THE ROOM"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:background="@drawable/bg_button_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

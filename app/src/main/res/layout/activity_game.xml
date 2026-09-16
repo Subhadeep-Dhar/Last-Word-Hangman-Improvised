@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/gameRootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pure_dark"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:id="@+id/bottomStatsBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView android:fontFamily="@font/ghastly_panic"
+            android:id="@+id/tvGameCategory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:text="CAT: ANIMALS"
+            android:textColor="@color/dim_gray"
+            android:textSize="32sp"
+            android:letterSpacing="0.1"
+            android:textAllCaps="true"
+            android:gravity="start|center_vertical"
+            android:textStyle="bold" />
+
+        <TextView android:fontFamily="@font/ghastly_panic"
+            android:id="@+id/tvGameAttempts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:text="ATTEMPTS: 5"
+            android:textColor="@color/horror_red"
+            android:textSize="32sp"
+            android:letterSpacing="0.1"
+            android:textStyle="bold"
+            android:gravity="end|center_vertical" />
+
+        <TextView android:fontFamily="@font/ghastly_panic"
+            android:id="@+id/tvGameTimer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:text="TIME: --"
+            android:textColor="@color/pale_white"
+            android:textSize="32sp"
+            android:letterSpacing="0.1"
+            android:textStyle="bold"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- Cinematic Viewport -->
+    <FrameLayout
+        android:id="@+id/horrorFrame"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="8dp"
+        android:background="#050505"
+        android:clipChildren="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:id="@+id/horrorEnvironmentView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#0a0a0a" />
+
+        <View
+            android:id="@+id/vignetteOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/overlay_vignette"
+            android:alpha="0.6"/>
+
+        <com.example.lastword.utils.HangmanView
+            android:id="@+id/hangmanView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvHorrorStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:text="THEY ARE STILL WAITING."
+            android:textColor="@color/dim_gray"
+            android:textSize="42sp"
+            android:letterSpacing="0.05"
+            android:textStyle="italic"
+            android:gravity="center"
+            android:fontFamily="@font/ghastly_panic"
+            android:padding="20dp" />
+    </FrameLayout>
+
+    <!-- Hidden Word -->
+    <TextView
+        android:id="@+id/tvHiddenWord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="_ _ _ _ _"
+        android:textColor="@color/white"
+        android:textSize="42sp"
+        android:letterSpacing="0.25"
+        android:gravity="center"
+        
+        app:layout_constraintTop_toBottomOf="@id/horrorFrame"
+        app:layout_constraintStart_toStartOf="parent"  android:fontFamily="@font/ghastly_panic" />
+
+    <!-- Keyboard -->
+    <GridLayout
+        android:id="@+id/glAlphabetKeyboard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:columnCount="7"
+        android:alignmentMode="alignBounds"
+        app:layout_constraintTop_toBottomOf="@id/tvHiddenWord"
+        app:layout_constraintBottom_toTopOf="@id/bottomStatsBar"
+        app:layout_constraintStart_toStartOf="parent">
+        <!-- Buttons injected programmatically -->
+    </GridLayout>
+
+    <!-- Global Flicker Layer -->
+    <View
+        android:id="@+id/gameFlickerOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:alpha="0.0"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
