@@ -56,7 +56,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button android:textSize="22sp"
+    <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
         android:id="@+id/btnBack"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -68,3 +68,4 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

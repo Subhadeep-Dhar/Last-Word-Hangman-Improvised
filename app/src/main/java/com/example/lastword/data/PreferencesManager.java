@@ -129,7 +129,7 @@ public class PreferencesManager {
         return null;
     }
 
-    public void updateStats(String username, int score, boolean won) {
+    public void updateStats(String username, int score, boolean won, String difficulty) {
         try {
             String usersStr = prefs.getString(KEY_USERS, "[]");
             JSONArray array = new JSONArray(usersStr);
@@ -150,6 +150,14 @@ public class PreferencesManager {
                     user.put("losses", losses);
                     user.put("streak", currentStreak);
                     user.put("highScore", highScore);
+
+                    if ("EASY".equalsIgnoreCase(difficulty)) {
+                        user.put("animals_" + (won ? "saved" : "killed"), user.optInt("animals_" + (won ? "saved" : "killed"), 0) + 1);
+                    } else if ("INTERMEDIATE".equalsIgnoreCase(difficulty)) {
+                        user.put("adults_" + (won ? "saved" : "killed"), user.optInt("adults_" + (won ? "saved" : "killed"), 0) + 1);
+                    } else if ("HARD".equalsIgnoreCase(difficulty)) {
+                        user.put("children_" + (won ? "saved" : "killed"), user.optInt("children_" + (won ? "saved" : "killed"), 0) + 1);
+                    }
 
                     JSONArray achs = user.optJSONArray("achievements");
                     if (achs == null) achs = new JSONArray();

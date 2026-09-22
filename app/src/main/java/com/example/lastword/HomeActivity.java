@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity {
     private Button btnEnterGame, btnProfile, btnLeaderboard, btnInstructions, btnSettings;
-    private TextView tvActiveSubject, tvSaved, tvLosses;
+    private TextView tvTitle, tvSubtitle, tvActiveSubject, tvAnimalsStat, tvAdultsStat, tvChildrenStat;
     private View flickerOverlay;
     private PreferencesManager prefs;
     private SoundManager soundManager;
@@ -32,8 +32,9 @@ public class HomeActivity extends AppCompatActivity {
         btnInstructions = findViewById(R.id.btnInstructions);
         btnSettings = findViewById(R.id.btnSettings);
         tvActiveSubject = findViewById(R.id.tvActiveSubject);
-        tvSaved = findViewById(R.id.tvSaved);
-        tvLosses = findViewById(R.id.tvLosses);
+        tvAnimalsStat = findViewById(R.id.tvAnimalsStat);
+        tvAdultsStat = findViewById(R.id.tvAdultsStat);
+        tvChildrenStat = findViewById(R.id.tvChildrenStat);
         flickerOverlay = findViewById(R.id.flickerOverlay);
 
         AnimationHelper.startFlickerSystem(flickerOverlay);
@@ -76,12 +77,24 @@ public class HomeActivity extends AppCompatActivity {
         if (user != null) {
             JSONObject data = prefs.getUserData(user);
             if (data != null) {
-                int kills = data.optInt("losses", 0);
-                int wins = data.optInt("wins", 0);
                 tvActiveSubject.setText("Active Subject: " + user);
-                tvSaved.setText("Saved: " + wins);
-                tvLosses.setText("Victim Losses: " + kills);
+                
+                int animalsSaved = data.optInt("animals_saved", 0);
+                int animalsKilled = data.optInt("animals_killed", 0);
+                int adultsSaved = data.optInt("adults_saved", 0);
+                int adultsKilled = data.optInt("adults_killed", 0);
+                int childrenSaved = data.optInt("children_saved", 0);
+                int childrenKilled = data.optInt("children_killed", 0);
+
+                tvAnimalsStat.setText("Animals: " + animalsSaved + " Saved | " + animalsKilled + " Sacrificed");
+                tvAdultsStat.setText("Adults: " + adultsSaved + " Saved | " + adultsKilled + " Murdered");
+                tvChildrenStat.setText("Children: " + childrenSaved + " Saved | " + childrenKilled + " Lost");
             }
+        } else {
+            tvActiveSubject.setText("Active Subject: None");
+            tvAnimalsStat.setText("Animals: 0 Saved | 0 Sacrificed");
+            tvAdultsStat.setText("Adults: 0 Saved | 0 Murdered");
+            tvChildrenStat.setText("Children: 0 Saved | 0 Lost");
         }
     }
 }

@@ -89,13 +89,14 @@
                     android:inputType="textPassword"
                     android:layout_marginBottom="20dp"/>
 
-                <Button android:textSize="22sp"
+                <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
                     android:id="@+id/btnLogin"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:text="ENTER THE ROOM"
+                    android:layout_height="50dp"
+                    android:text="ENTER"
                     android:textColor="@color/white"
                     android:background="@drawable/bg_button_dark"
+                    android:layout_marginTop="24dp"
                     android:letterSpacing="0.1"
                     android:textStyle="bold"/>
             </LinearLayout>
@@ -126,3 +127,4 @@
         android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

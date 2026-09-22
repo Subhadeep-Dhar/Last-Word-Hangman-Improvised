@@ -165,16 +165,17 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnEnterRoom"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:text="ENTER THE ROOM"
         android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textSize="28sp"
         android:background="@drawable/bg_button_dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

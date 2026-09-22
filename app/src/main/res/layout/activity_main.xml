@@ -12,7 +12,7 @@
             android:layout_height="wrap_content"
             android:text="LAST WORD"
             android:textColor="@color/horror_red"
-            android:textSize="80sp"
+            android:textSize="120sp"
             android:textStyle="bold"
             android:letterSpacing="0.3"
             android:alpha="0"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:text="Every mistake has a consequence."
         android:textColor="@color/dim_gray"
-        android:textSize="36sp"
+        android:textSize="54sp"
         android:letterSpacing="0.1"
         android:textStyle="italic"
         android:alpha="0"
@@ -45,3 +45,4 @@
         android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

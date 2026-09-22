@@ -93,13 +93,13 @@ public class ResultActivity extends AppCompatActivity {
         final Handler handler = new Handler(Looper.getMainLooper());
 
         String[] horribleMessages = {
-            "THEIR BLOOD IS ON YOUR HANDS.",
-            "YOU WATCHED THEM DIE.",
-            "YOUR HESITATION SEALED THEIR FATE.",
-            "THEY BEGGED FOR YOU. YOU FAILED.",
-            "ANOTHER SOUL LOST TO THE VOID.",
-            "YOU ARE THE REASON THEY SUFFER.",
-            "THEIR SCREAMS ARE YOUR FAULT."
+            "You could have saved me... please, save the next one.",
+            "Why did you let me drop? Don't let it happen again.",
+            "I trusted you with my life... save the others.",
+            "It hurts... please don't fail the next one.",
+            "I didn't want to die... save them instead.",
+            "You watched me hang... don't make them suffer too.",
+            "I'm gone... but they are still waiting for you."
         };
         String failureMessage = horribleMessages[new java.util.Random().nextInt(horribleMessages.length)];
 

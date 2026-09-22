@@ -6,9 +6,9 @@
     <color name="mid_gray">#141414</color>
     <color name="raised_gray">#242424</color>
     <color name="muted_off_white">#B0B0B0</color>
-    <color name="horror_red">#8B0000</color>
-    <color name="crimson">#B22222</color>
-    <color name="blood_red">#660000</color>
+    <color name="horror_red">#E60000</color>
+    <color name="crimson">#FF0000</color>
+    <color name="blood_red">#BB0000</color>
     <color name="dim_gray">#555555</color>
     <color name="pale_white">#DDDDDD</color>
     <color name="white">#FFFFFF</color>

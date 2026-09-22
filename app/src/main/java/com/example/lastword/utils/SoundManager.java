@@ -5,12 +5,14 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.ToneGenerator;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
+import com.example.lastword.R;
 import com.example.lastword.data.PreferencesManager;
 
 public class SoundManager {
@@ -19,6 +21,24 @@ public class SoundManager {
     private AudioTrack ambientTrack;
     private boolean isAmbientPlaying = false;
     private Thread ambientThread;
+    private String currentDifficulty = "EASY";
+    private Handler fadeHandler = new Handler(Looper.getMainLooper());
+
+    private final int[] adultScreams = {
+        R.raw.adult_screem_1, R.raw.adult_screem_2, R.raw.adult_screem_3, R.raw.adult_screem_4, R.raw.adult_screem_5
+    };
+    private final int[] childCries = {
+        R.raw.baby_crying_9, R.raw.baby_crying_10
+    };
+    private final int[] animalWhimpers = {
+        R.raw.animal_cying_6, R.raw.animal_cying_7, R.raw.animal_cying_8
+    };
+
+    public void setDifficulty(String difficulty) {
+        if (difficulty != null) {
+            this.currentDifficulty = difficulty;
+        }
+    }
 
     public SoundManager(Context context) {
         this.context = context.getApplicationContext();
@@ -78,12 +98,20 @@ public class SoundManager {
     public void playHeartbeat(int intensity) {
         if (!prefs.isSoundEnabled()) return;
         try {
+            int toneType = ToneGenerator.TONE_CDMA_KEYPAD_VOLUME_KEY_LITE;
+            if ("HARD".equals(currentDifficulty)) {
+                toneType = ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE; // Higher pitch for child
+            } else if ("EASY".equals(currentDifficulty)) {
+                toneType = ToneGenerator.TONE_CDMA_LOW_PBX_L; // Lower pitch for animal
+            }
+            final int finalToneType = toneType;
+
             final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 35 + (intensity * 12));
-            tg.startTone(ToneGenerator.TONE_CDMA_KEYPAD_VOLUME_KEY_LITE, 100);
+            tg.startTone(finalToneType, 100);
             vibrate(50);
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 try {
-                    tg.startTone(ToneGenerator.TONE_CDMA_KEYPAD_VOLUME_KEY_LITE, 100);
+                    tg.startTone(finalToneType, 100);
                     vibrate(40);
                     new Handler(Looper.getMainLooper()).postDelayed(tg::release, 150);
                 } catch (Exception ignored) {}
@@ -104,10 +132,14 @@ public class SoundManager {
 
             for (int i = 0; i < numSamples; ++i) {
                 double t = (double) i / sampleRate;
-                // Dark Drone: 40Hz + 41Hz for beating + 110Hz harmonics
-                double wave = Math.sin(2 * Math.PI * 40.0 * t) * 0.6;
-                wave += Math.sin(2 * Math.PI * 41.2 * t) * 0.4;
-                wave += Math.sin(2 * Math.PI * 110.0 * t) * 0.1 * Math.sin(2 * Math.PI * 0.2 * t);
+                
+                double baseFreq = 40.0;
+                if ("HARD".equals(currentDifficulty)) baseFreq = 60.0; // Higher frequency
+                else if ("EASY".equals(currentDifficulty)) baseFreq = 30.0; // Deep growl freq
+
+                double wave = Math.sin(2 * Math.PI * baseFreq * t) * 0.6;
+                wave += Math.sin(2 * Math.PI * (baseFreq + 1.2) * t) * 0.4;
+                wave += Math.sin(2 * Math.PI * (baseFreq * 2.75) * t) * 0.1 * Math.sin(2 * Math.PI * 0.2 * t);
                 
                 // Slow volume breathe
                 double lfo = 0.7 + 0.3 * Math.sin(2 * Math.PI * 0.15 * t);
@@ -159,14 +191,82 @@ public class SoundManager {
         }
     }
 
+    private void playFadingSound(int rawResId, float maxVolume) {
+        if (rawResId == 0) return;
+        try {
+            MediaPlayer mp = MediaPlayer.create(context, rawResId);
+            if (mp == null) return;
+            
+            mp.setVolume(0f, 0f);
+            mp.start();
+            
+            long duration = mp.getDuration();
+            long fadeInTime = 300;
+            long fadeOutTime = 500;
+            if (duration < 800) {
+                fadeInTime = duration / 2;
+                fadeOutTime = duration / 2;
+            }
+            
+            final long finalFadeIn = fadeInTime;
+            final long finalFadeOut = fadeOutTime;
+            
+            android.animation.ValueAnimator fadeIn = android.animation.ValueAnimator.ofFloat(0f, maxVolume);
+            fadeIn.setDuration(finalFadeIn);
+            fadeIn.addUpdateListener(a -> {
+                try {
+                    float v = (float) a.getAnimatedValue();
+                    mp.setVolume(v, v);
+                } catch (Exception ignored) {}
+            });
+            fadeIn.start();
+            
+            long fadeOutStart = duration - fadeOutTime;
+            fadeHandler.postDelayed(() -> {
+                try {
+                    if (mp.isPlaying()) {
+                        android.animation.ValueAnimator fadeOut = android.animation.ValueAnimator.ofFloat(maxVolume, 0f);
+                        fadeOut.setDuration(finalFadeOut);
+                        fadeOut.addUpdateListener(a -> {
+                            try {
+                                float v = (float) a.getAnimatedValue();
+                                mp.setVolume(v, v);
+                            } catch (Exception ignored) {}
+                        });
+                        fadeOut.start();
+                    }
+                } catch (Exception ignored) {}
+            }, fadeOutStart);
+            
+            mp.setOnCompletionListener(MediaPlayer::release);
+        } catch (Exception ignored) {}
+    }
+
+    public void playMistakeSound() {
+        if (!prefs.isSoundEnabled()) return;
+        try {
+            int rawResId = adultScreams[(int)(Math.random() * adultScreams.length)];
+            if ("HARD".equals(currentDifficulty)) {
+                rawResId = childCries[(int)(Math.random() * childCries.length)];
+            } else if ("EASY".equals(currentDifficulty)) {
+                rawResId = animalWhimpers[(int)(Math.random() * animalWhimpers.length)];
+            }
+            playFadingSound(rawResId, 0.3f); // Lower volume (0.3) for mistake
+        } catch (Exception ignored) {}
+    }
+
     public void playFailureSound() {
         stopAmbientAtmosphere();
         if (!prefs.isSoundEnabled()) return;
         try {
-            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-            tg.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 1500);
+            int rawResId = adultScreams[(int)(Math.random() * adultScreams.length)];
+            if ("HARD".equals(currentDifficulty)) {
+                rawResId = childCries[(int)(Math.random() * childCries.length)];
+            } else if ("EASY".equals(currentDifficulty)) {
+                rawResId = animalWhimpers[(int)(Math.random() * animalWhimpers.length)];
+            }
+            playFadingSound(rawResId, 0.6f); // Slightly louder for full failure
             vibrate(1000);
-            new Handler(Looper.getMainLooper()).postDelayed(tg::release, 2000);
         } catch (Exception ignored) {}
     }
 

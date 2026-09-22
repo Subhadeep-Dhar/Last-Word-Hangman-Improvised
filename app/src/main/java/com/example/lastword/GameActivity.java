@@ -88,6 +88,13 @@ public class GameActivity extends AppCompatActivity {
         tvGameCategory.setText("DESTINATION: " + category + " / " + difficulty);
         tvHiddenWord.setText(formatWord(displayedWord.toString()));
         updateAttemptsUI();
+        
+        if (hangmanView != null) {
+            hangmanView.setDifficulty(difficulty);
+        }
+        if (soundManager != null) {
+            soundManager.setDifficulty(difficulty);
+        }
 
         if ("TIMER".equals(mode)) {
             startTimeLimit();
@@ -184,6 +191,7 @@ public class GameActivity extends AppCompatActivity {
                 
                 pacedHandler.postDelayed(() -> {
                     soundManager.playWrong();
+                    soundManager.playMistakeSound();
                     AnimationHelper.shakeView(horrorFrame, horrorState + 1);
                     AnimationHelper.triggerSingleFlicker(gameFlickerOverlay);
                     soundManager.vibrate(100);
@@ -278,7 +286,7 @@ public class GameActivity extends AppCompatActivity {
             int timeBonus = mode.equals("TIMER") ? (int)(timeRemainingMillis / 1000) * 15 : 0;
             score = baseScore + accuracyBonus + timeBonus;
             
-            prefs.updateStats(prefs.getCurrentUser(), score, true);
+            prefs.updateStats(prefs.getCurrentUser(), score, true, difficulty);
             
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 soundManager.playVictorySound();
@@ -305,7 +313,7 @@ public class GameActivity extends AppCompatActivity {
         isGameOver = true;
         if (gameTimer != null) gameTimer.cancel();
         
-        prefs.updateStats(prefs.getCurrentUser(), 0, false);
+        prefs.updateStats(prefs.getCurrentUser(), 0, false, difficulty);
         soundManager.stopAmbientAtmosphere();
         
         glAlphabetKeyboard.setVisibility(View.INVISIBLE);

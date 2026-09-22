@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="YOU SAVED THEM."
             android:textColor="@color/white"
-            android:textSize="80sp"
+            android:textSize="120sp"
             android:textStyle="bold"
             android:letterSpacing="0.1"
             
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:text="WORD: XXXXX"
             android:textColor="@color/dim_gray"
-            android:textSize="48sp"
+            android:textSize="72sp"
             android:letterSpacing="0.1"
             android:layout_marginBottom="32dp"/>
 
@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:text="BASE SCORE: 0"
                 android:textColor="@color/pale_white"
-                android:textSize="32sp"
+                android:textSize="48sp"
                 android:letterSpacing="0.1"
                 android:layout_marginBottom="8dp"/>
 
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:text="ACCURACY BONUS: 0"
                 android:textColor="@color/pale_white"
-                android:textSize="32sp"
+                android:textSize="48sp"
                 android:letterSpacing="0.1"
                 android:layout_marginBottom="8dp"/>
 
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="TIME BONUS: 0"
                 android:textColor="@color/pale_white"
-                android:textSize="32sp"
+                android:textSize="48sp"
                 android:letterSpacing="0.1"
                 android:layout_marginBottom="12dp"/>
 
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:text="TOTAL RITUAL SCORE: 0"
                 android:textColor="@color/horror_red"
-                android:textSize="54sp"
+                android:textSize="80sp"
                 android:letterSpacing="0.1"
                 android:fontFamily="@font/ghastly_panic"
                 android:gravity="center"
@@ -109,7 +109,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button android:textSize="22sp"
+        <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
             android:id="@+id/btnPlayAgain"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -118,7 +118,7 @@
             android:background="@drawable/bg_button_dark"
             android:layout_marginBottom="12dp"/>
 
-        <Button android:textSize="22sp"
+        <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
             android:id="@+id/btnHome"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -128,3 +128,4 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
