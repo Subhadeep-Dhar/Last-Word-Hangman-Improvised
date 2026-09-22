@@ -1,7 +1,7 @@
 # Last Word: A Psychological Horror Hangman
 
 <p align="center">
-  <img src="docs/screenshots/hero.jpg" alt="Last Word Logo" width="500">
+  <img src="docs/screenshots/logo.png" alt="Last Word Logo" width="500">
 </p>
 
 > Every mistake has a consequence.
