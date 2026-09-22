@@ -10,6 +10,12 @@ Download and install the latest Android APK from GitHub Releases.
 
 **[⬇️ Download LAST WORD APK](https://github.com/Subhadeep-Dhar/Last-Word-Hangman-Improvised/releases/download/v1.0.0/LAST_WORD_v1.0.0.apk)**
 
+## 📸 Screenshots
+
+| <img src="docs/screenshots/hero.jpg" width="200" /> | <img src="docs/screenshots/login.jpg" width="200" /> | <img src="docs/screenshots/signup.jpg" width="200" /> | <img src="docs/screenshots/setup.jpg" width="200" /> | <img src="docs/screenshots/rules.jpg" width="200" /> |
+| :---: | :---: | :---: | :---: | :---: |
+| **Last Word** | **Identify Yourself** | **Join the Void** | **Choose Your Fate** | **Ritual Insight** |
+
 ---
 
 **Last Word** is a deeply atmospheric, psychological horror twist on the classic word-guessing game of Hangman. Built natively for Android, it abandons the casual, child-friendly aesthetic of traditional Hangman and replaces it with a cinematic, anxiety-inducing experience. 
