@@ -1,5 +1,17 @@
 # Last Word: A Psychological Horror Hangman
 
+> Every mistake has a consequence.
+
+## 📱 Download
+
+[![Download APK](https://img.shields.io/badge/Download-LAST%20WORD%20APK-red?style=for-the-badge)](https://github.com/Subhadeep-Dhar/Last-Word-Hangman-Improvised/releases/latest)
+
+Download and install the latest Android APK from GitHub Releases.
+
+**[⬇️ Download LAST WORD APK](https://github.com/Subhadeep-Dhar/Last-Word-Hangman-Improvised/releases/download/v1.0.0/LAST_WORD_v1.0.0.apk)**
+
+---
+
 **Last Word** is a deeply atmospheric, psychological horror twist on the classic word-guessing game of Hangman. Built natively for Android, it abandons the casual, child-friendly aesthetic of traditional Hangman and replaces it with a cinematic, anxiety-inducing experience. 
 
 Players must guess words across various categories (Animals, Objects, Celebrities) while fighting against their dwindling attempts. Every mistake inches the dynamic, blood-drawn execution closer to completion. The game actively builds tension using a custom sound engine featuring ambient dread, accelerating heartbeats, glitching UI elements, and a horrific guilt-trip narrative upon failure.
