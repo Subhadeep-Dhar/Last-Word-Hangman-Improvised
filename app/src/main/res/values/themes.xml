@@ -8,6 +8,7 @@
         <item name="android:windowBackground">@color/pure_dark</item>
         <item name="android:navigationBarColor">@color/black</item>
         <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
         
         <!-- Text appearances -->
         <item name="android:textAppearanceSmall">@style/HorrorText.Small</item>

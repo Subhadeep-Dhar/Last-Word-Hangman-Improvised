@@ -3,8 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pure_dark"
-    android:padding="24dp">
+    android:background="@color/pure_dark">
+
+    <!-- Top Left Quick Back Button -->
+    <ImageButton
+        android:id="@+id/btnTopBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@drawable/bg_button_dark"
+        android:contentDescription="Return"
+        android:padding="10dp"
+        android:layout_marginTop="52dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tvInstructionsTitle"
@@ -15,14 +28,16 @@
         android:textSize="46sp"
         android:textStyle="bold"
         android:letterSpacing="0.1"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="54dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" android:fontFamily="@font/ghastly_panic" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="@font/ghastly_panic" />
 
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintTop_toBottomOf="@id/tvInstructionsTitle"
@@ -37,32 +52,41 @@
             android:background="@drawable/bg_horror_card"
             android:padding="16dp">
 
-            <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="THE RULES OF THE APPARITION:"
-                android:textColor="@color/white"
-                android:textSize="34sp"
+                android:textColor="@color/horror_red"
+                android:textSize="20sp"
                 android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"
+                android:letterSpacing="0.08"
                 android:layout_marginBottom="12dp"/>
 
-            <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="1. You are here to rescue a trapped essence. Choose your destination target wisely: Animals, Horror Movies, or Celebrities.\n\n2. The levels determine sacrifice risk and assistance. Easy provides cryptic clues to assist your guesses. Medium and Hard force you into total psychological darkness without clues.\n\n3. Daily Challenge summons a unique, medium-difficulty tether once per local day. Each daily outcome is etched permanently into your record once.\n\n4. Select a ritual mode. Classic allows you to guess carefully through errors. Timer Mode accelerates reality, imposing an unyielding time limit before permanent failure is cast.\n\n5. Select keys from the grid. Correct choices reveal letters; completing the word severs the rope to set them free. Wrong selections or running out of time seal their doom and tally a Kill.\n\n6. The Soul Registry preserves your total rituals, saved lives, kills, resonance scores, and rescue streaks offline on this device."
-                android:textColor="@color/pale_white"
-                android:textSize="30sp"
-                android:lineSpacingMultiplier="1.2"/>
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:fontFamily="serif"
+                android:lineSpacingMultiplier="1.3"/>
         </LinearLayout>
     </ScrollView>
 
-    <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnBack"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:text="RETURN TO SURFACE"
         android:textColor="@color/pale_white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"
+        android:letterSpacing="0.08"
         android:background="@drawable/bg_button_dark"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

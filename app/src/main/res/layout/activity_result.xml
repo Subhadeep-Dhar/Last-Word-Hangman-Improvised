@@ -4,15 +4,40 @@
     android:id="@+id/resultRootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
-    android:padding="24dp">
+    android:background="@color/black">
+
+    <!-- Atmospheric Horror Bats & Glowing Eyes Background -->
+    <com.example.lastword.utils.HorrorAtmosphereView
+        android:id="@+id/horrorAtmosphereView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Top Left Quick Return Button -->
+    <ImageButton
+        android:id="@+id/btnTopBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@drawable/bg_button_dark"
+        android:contentDescription="Return to Surface"
+        android:padding="10dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/contentLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/buttonLayout"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,10 +49,12 @@
             android:layout_height="wrap_content"
             android:text="YOU SAVED THEM."
             android:textColor="@color/white"
-            android:textSize="90sp"
+            android:textSize="80sp"
             android:textStyle="bold"
             android:letterSpacing="0.1"
             android:gravity="center"
+            android:shadowColor="#E60000"
+            android:shadowRadius="20"
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/ghastly_panic" />
 
@@ -36,29 +63,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=""
-            android:textColor="@color/pale_white"
-            android:textSize="32sp"
-            android:letterSpacing="0.08"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:letterSpacing="0.03"
             android:gravity="center"
             android:visibility="gone"
             android:textStyle="italic"
             android:paddingHorizontal="16dp"
             android:layout_marginBottom="18dp"
-            android:fontFamily="@font/ghastly_panic" />
+            android:fontFamily="serif" />
 
         <TextView
             android:id="@+id/tvResultWord"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="WORD: XXXXX"
-            android:textColor="@color/dim_gray"
-            android:textSize="56sp"
-            android:letterSpacing="0.1"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
             android:gravity="center"
             android:layout_marginBottom="24dp"
-            android:fontFamily="@font/ghastly_panic"/>
+            android:fontFamily="sans-serif-condensed"/>
 
         <LinearLayout
+            android:id="@+id/scoreCardLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -66,83 +95,116 @@
             android:padding="20dp"
             android:layout_marginBottom="16dp">
 
-            <TextView android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:id="@+id/tvBaseScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="BASE SCORE: 0"
-                android:textColor="@color/pale_white"
-                android:textSize="48sp"
-                android:letterSpacing="0.1"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginBottom="8dp"/>
 
-            <TextView android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:id="@+id/tvAccuracyBonus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="ACCURACY BONUS: 0"
-                android:textColor="@color/pale_white"
-                android:textSize="48sp"
-                android:letterSpacing="0.1"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginBottom="8dp"/>
 
-            <TextView android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:id="@+id/tvTimeBonus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TIME BONUS: 0"
-                android:textColor="@color/pale_white"
-                android:textSize="48sp"
-                android:letterSpacing="0.1"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginBottom="12dp"/>
 
             <View
+                android:id="@+id/scoreDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/horror_red"
                 android:layout_marginBottom="12dp"/>
 
+            <!-- Answer Section (The Word Was : XXXX) - Substantially Enlarged -->
             <TextView
                 android:id="@+id/tvFinalScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TOTAL RITUAL SCORE: 0"
                 android:textColor="@color/horror_red"
-                android:textSize="80sp"
-                android:letterSpacing="0.1"
-                android:fontFamily="@font/ghastly_panic"
+                android:textSize="36sp"
+                android:letterSpacing="0.08"
+                android:fontFamily="sans-serif-condensed"
                 android:gravity="center"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:shadowColor="#E60000"
+                android:shadowRadius="18"
                 android:textStyle="bold"/>
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/buttonLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnPlayAgain"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="TRY AGAIN"
             android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
+            android:letterSpacing="0.08"
             android:background="@drawable/bg_button_dark"
             android:layout_marginBottom="12dp"/>
 
-        <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnHome"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="RETURN TO SURFACE"
             android:textColor="@color/pale_white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
+            android:letterSpacing="0.08"
             android:background="@drawable/bg_button_dark"/>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- 3D Spatial Blood Splatter & Dripping Overlay (Placed on top so splatters hit the camera lens/screen) -->
+    <com.example.lastword.utils.BloodSplashOverlayView
+        android:id="@+id/bloodSplashOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:alpha="0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+</androidx.constraintlayout.widget.ConstraintLayout>

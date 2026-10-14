@@ -1,5 +1,8 @@
 package com.example.lastword.utils;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +20,13 @@ public class HangmanView extends View {
     private Paint bloodPaint;
     private Paint spatterPaint;
     private Paint freedPaint;
+    private Paint rescuePaint;
     private int mistakes = 0;
     private String difficulty = "EASY";
     private float timeOffset = 0;
     private boolean isFreed = false;
+    private float rescueProgress = -1f;
+    private ValueAnimator rescueAnimator;
     private List<Spatter> spatters = new ArrayList<>();
     private Random random = new Random();
 
@@ -102,6 +109,14 @@ public class HangmanView extends View {
         freedPaint.setStrokeJoin(Paint.Join.ROUND);
         freedPaint.setAntiAlias(true);
         freedPaint.setShadowLayer(18f, 0f, 0f, Color.parseColor("#E60000"));
+
+        rescuePaint = new Paint();
+        rescuePaint.setStyle(Paint.Style.STROKE);
+        rescuePaint.setStrokeWidth(12f);
+        rescuePaint.setStrokeCap(Paint.Cap.ROUND);
+        rescuePaint.setStrokeJoin(Paint.Join.ROUND);
+        rescuePaint.setAntiAlias(true);
+        rescuePaint.setShadowLayer(16f, 0f, 0f, Color.RED);
     }
 
     public void setDifficulty(String diff) {
@@ -118,7 +133,37 @@ public class HangmanView extends View {
         return this.isFreed;
     }
 
+    public void startRescueAnimation(final Runnable onComplete) {
+        if (rescueAnimator != null) {
+            rescueAnimator.cancel();
+        }
+        rescueProgress = 0f;
+        rescueAnimator = ValueAnimator.ofFloat(0f, 1f);
+        rescueAnimator.setDuration(2600);
+        rescueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        rescueAnimator.addUpdateListener(animation -> {
+            rescueProgress = (float) animation.getAnimatedValue();
+            invalidate();
+        });
+        rescueAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isFreed = true;
+                rescueProgress = -1f;
+                invalidate();
+                if (onComplete != null) {
+                    onComplete.run();
+                }
+            }
+        });
+        rescueAnimator.start();
+    }
+
     public void resetState() {
+        if (rescueAnimator != null) {
+            rescueAnimator.cancel();
+        }
+        this.rescueProgress = -1f;
         this.mistakes = 0;
         this.isFreed = false;
         this.spatters.clear();
@@ -178,7 +223,9 @@ public class HangmanView extends View {
             }
         }
 
-        if (isFreed) {
+        if (rescueProgress >= 0f) {
+            drawRescueSequence(canvas, ropeX, scaffoldTopY, ropeBottomY, scaffoldBaseY, rescueProgress);
+        } else if (isFreed) {
             // ROPE IS CUT / SEVERED!
             canvas.drawLine(ropeX, scaffoldTopY, ropeX, scaffoldTopY + 25f, bloodPaint);
             canvas.drawLine(ropeX, scaffoldTopY + 25f, ropeX - 6f, scaffoldTopY + 36f, bloodPaint);
@@ -209,6 +256,158 @@ public class HangmanView extends View {
             if (mistakes > 0 && mistakes < 6) {
                 postInvalidateDelayed(30);
             }
+        }
+    }
+
+    private void drawRescueSequence(Canvas canvas, float ropeX, float scaffoldTopY, float ropeBottomY, float scaffoldBaseY, float p) {
+        // 1. Severed Top Rope with snap recoil
+        float snapFraction = Math.min(1f, p / 0.15f);
+        canvas.drawLine(ropeX, scaffoldTopY, ropeX, scaffoldTopY + 25f - (4f * snapFraction), bloodPaint);
+        canvas.drawLine(ropeX, scaffoldTopY + 25f - (4f * snapFraction), ropeX - 6f, scaffoldTopY + 34f - (4f * snapFraction), bloodPaint);
+        canvas.drawLine(ropeX, scaffoldTopY + 25f - (4f * snapFraction), ropeX + 6f, scaffoldTopY + 34f - (4f * snapFraction), bloodPaint);
+
+        // 2. Color transition from trapped horror red to pure relieved white
+        int color;
+        if (p < 0.45f) {
+            color = Color.parseColor("#E60000");
+        } else {
+            float blend = (p - 0.45f) / 0.55f;
+            int r = (int) (0xE6 + (0xFF - 0xE6) * blend);
+            int g = (int) (0x00 + (0xFF - 0x00) * blend);
+            int b = (int) (0x00 + (0xFF - 0x00) * blend);
+            color = Color.rgb(r, g, b);
+        }
+        rescuePaint.setColor(color);
+        if (p > 0.75f) {
+            rescuePaint.setShadowLayer(22f, 0f, 0f, Color.WHITE);
+        } else {
+            rescuePaint.setShadowLayer(15f, 0f, 0f, Color.RED);
+        }
+
+        // 3. Falling severed noose
+        float nooseGroundY = scaffoldBaseY - 12f;
+        float nooseDrop = Math.min(1f, p / 0.50f);
+        float nooseY = ropeBottomY + (nooseGroundY - ropeBottomY) * nooseDrop;
+        float nooseX = ropeX + (75f * nooseDrop);
+        canvas.drawLine(nooseX, nooseY - 14f, nooseX + 18f, nooseY, bloodPaint);
+        canvas.drawCircle(nooseX + 22f, nooseY, 8f, bloodPaint);
+
+        // 4. Character descent physics
+        if ("HARD".equals(difficulty)) {
+            drawRescuingChild(canvas, ropeX, ropeBottomY, scaffoldBaseY, p);
+        } else {
+            drawRescuingAdult(canvas, ropeX, ropeBottomY, scaffoldBaseY, p);
+        }
+    }
+
+    private void drawRescuingAdult(Canvas canvas, float ropeX, float ropeBottomY, float scaffoldBaseY, float p) {
+        float totalDrop = scaffoldBaseY - (ropeBottomY + 230f);
+        float currentDrop;
+        if (p < 0.15f) {
+            currentDrop = 0f;
+        } else if (p < 0.70f) {
+            float t = (p - 0.15f) / 0.55f;
+            float eased = (float) (1.0 - Math.pow(1.0 - t, 2.0));
+            currentDrop = totalDrop * eased;
+        } else if (p < 0.85f) {
+            float t = (p - 0.70f) / 0.15f;
+            float squat = (float) Math.sin(t * Math.PI) * 14f;
+            currentDrop = totalDrop + squat;
+        } else {
+            currentDrop = totalDrop;
+        }
+
+        float charX = ropeX + (15f * Math.min(1f, p / 0.70f));
+        float headCenterY = (ropeBottomY + 30f) + currentDrop;
+        float bodyTopY = headCenterY + 30f;
+        float bodyBottomY = bodyTopY + 90f;
+        float feetY = bodyBottomY + 80f;
+
+        // Head
+        canvas.drawCircle(charX, headCenterY, 28f, rescuePaint);
+        // Spine / torso
+        canvas.drawLine(charX, bodyTopY, charX, bodyBottomY, rescuePaint);
+
+        // Arms
+        float armTopY = bodyTopY + 15f;
+        if (p < 0.20f) {
+            canvas.drawLine(charX, armTopY, charX - 25f, armTopY + 15f, rescuePaint);
+            canvas.drawLine(charX, armTopY, charX + 25f, armTopY + 15f, rescuePaint);
+        } else if (p < 0.75f) {
+            float armSpread = 32f + 16f * (p / 0.75f);
+            canvas.drawLine(charX, armTopY, charX - armSpread, armTopY + 45f, rescuePaint);
+            canvas.drawLine(charX, armTopY, charX + armSpread, armTopY + 45f, rescuePaint);
+        } else {
+            float reliefT = (p - 0.75f) / 0.25f;
+            float armEndY = (armTopY + 45f) - (65f * reliefT);
+            float armEndX = 32f + (10f * reliefT);
+            canvas.drawLine(charX, armTopY, charX - armEndX, armEndY, rescuePaint);
+            canvas.drawLine(charX, armTopY, charX + armEndX, armEndY, rescuePaint);
+        }
+
+        // Legs
+        if (p < 0.70f) {
+            canvas.drawLine(charX, bodyBottomY, charX - 25f, feetY, rescuePaint);
+            canvas.drawLine(charX, bodyBottomY, charX + 25f, feetY, rescuePaint);
+        } else {
+            canvas.drawLine(charX, bodyBottomY, charX - 25f, scaffoldBaseY, rescuePaint);
+            canvas.drawLine(charX, bodyBottomY, charX + 25f, scaffoldBaseY, rescuePaint);
+        }
+    }
+
+    private void drawRescuingChild(Canvas canvas, float ropeX, float ropeBottomY, float scaffoldBaseY, float p) {
+        float headRadius = 22f;
+        float totalDrop = scaffoldBaseY - (ropeBottomY + 139f);
+        float currentDrop;
+        if (p < 0.15f) {
+            currentDrop = 0f;
+        } else if (p < 0.70f) {
+            float t = (p - 0.15f) / 0.55f;
+            float eased = (float) (1.0 - Math.pow(1.0 - t, 2.0));
+            currentDrop = totalDrop * eased;
+        } else if (p < 0.85f) {
+            float t = (p - 0.70f) / 0.15f;
+            float squat = (float) Math.sin(t * Math.PI) * 10f;
+            currentDrop = totalDrop + squat;
+        } else {
+            currentDrop = totalDrop;
+        }
+
+        float charX = ropeX + (12f * Math.min(1f, p / 0.70f));
+        float headCenterY = (ropeBottomY + headRadius) + currentDrop;
+        float bodyTopY = headCenterY + headRadius;
+        float bodyBottomY = bodyTopY + 50f;
+        float feetY = bodyBottomY + 45f;
+
+        // Head
+        canvas.drawCircle(charX, headCenterY, headRadius, rescuePaint);
+        // Torso
+        canvas.drawLine(charX, bodyTopY, charX, bodyBottomY, rescuePaint);
+
+        // Arms
+        float armTopY = bodyTopY + 10f;
+        if (p < 0.20f) {
+            canvas.drawLine(charX, armTopY, charX - 18f, armTopY + 12f, rescuePaint);
+            canvas.drawLine(charX, armTopY, charX + 18f, armTopY + 12f, rescuePaint);
+        } else if (p < 0.75f) {
+            float spread = 22f + 10f * (p / 0.75f);
+            canvas.drawLine(charX, armTopY, charX - spread, armTopY + 30f, rescuePaint);
+            canvas.drawLine(charX, armTopY, charX + spread, armTopY + 30f, rescuePaint);
+        } else {
+            float reliefT = (p - 0.75f) / 0.25f;
+            float armEndY = (armTopY + 30f) - (45f * reliefT);
+            float armEndX = 22f + (8f * reliefT);
+            canvas.drawLine(charX, armTopY, charX - armEndX, armEndY, rescuePaint);
+            canvas.drawLine(charX, armTopY, charX + armEndX, armEndY, rescuePaint);
+        }
+
+        // Legs
+        if (p < 0.70f) {
+            canvas.drawLine(charX, bodyBottomY, charX - 18f, feetY, rescuePaint);
+            canvas.drawLine(charX, bodyBottomY, charX + 18f, feetY, rescuePaint);
+        } else {
+            canvas.drawLine(charX, bodyBottomY, charX - 18f, scaffoldBaseY, rescuePaint);
+            canvas.drawLine(charX, bodyBottomY, charX + 18f, scaffoldBaseY, rescuePaint);
         }
     }
 

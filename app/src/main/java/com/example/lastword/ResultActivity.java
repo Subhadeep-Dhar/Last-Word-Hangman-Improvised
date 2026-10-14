@@ -2,16 +2,21 @@ package com.example.lastword;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import com.example.lastword.data.PreferencesManager;
 import com.example.lastword.utils.AnimationHelper;
+import com.example.lastword.utils.BloodSplashOverlayView;
+import com.example.lastword.utils.HorrorAtmosphereView;
 import com.example.lastword.utils.SoundManager;
 
 import java.util.Random;
@@ -22,6 +27,8 @@ public class ResultActivity extends AppCompatActivity {
     private TextView tvResultTitle, tvRescueMessage, tvResultWord, tvBaseScore, tvAccuracyBonus, tvTimeBonus, tvFinalScore;
     private Button btnPlayAgain, btnHome;
     private View resultRootLayout, contentLayout, buttonLayout;
+    private BloodSplashOverlayView bloodSplashOverlay;
+    private HorrorAtmosphereView horrorAtmosphereView;
     private SoundManager soundManager;
     private PreferencesManager prefs;
     private String displayedRescueMessage;
@@ -72,6 +79,8 @@ public class ResultActivity extends AppCompatActivity {
         resultRootLayout = findViewById(R.id.resultRootLayout);
         contentLayout = findViewById(R.id.contentLayout);
         buttonLayout = findViewById(R.id.buttonLayout);
+        bloodSplashOverlay = findViewById(R.id.bloodSplashOverlay);
+        horrorAtmosphereView = findViewById(R.id.horrorAtmosphereView);
 
         boolean won = getIntent().getBooleanExtra("WON", false);
         String word = getIntent().getStringExtra("WORD");
@@ -101,6 +110,17 @@ public class ResultActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+        android.view.View btnTopBack = findViewById(R.id.btnTopBack);
+        if (btnTopBack != null) {
+            btnTopBack.setOnClickListener(v -> {
+                soundManager.playClick();
+                Intent intent = new Intent(ResultActivity.this, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            });
+        }
     }
 
     @Override
@@ -112,12 +132,26 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void showVictory(String word) {
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.stop();
+        }
+        if (bloodSplashOverlay != null) {
+            bloodSplashOverlay.clearBlood();
+            bloodSplashOverlay.setVisibility(View.GONE);
+        }
+
         resultRootLayout.setBackgroundColor(Color.parseColor("#050505"));
         buttonLayout.setVisibility(View.VISIBLE);
         contentLayout.setVisibility(View.VISIBLE);
         
+        Typeface horrorFont = ResourcesCompat.getFont(this, R.font.ghastly_panic);
         tvResultTitle.setText("YOU SAVED THEM.");
+        tvResultTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 54);
+        if (horrorFont != null) {
+            tvResultTitle.setTypeface(horrorFont);
+        }
         tvResultTitle.setTextColor(Color.WHITE);
+        tvResultTitle.setShadowLayer(20, 0, 0, Color.parseColor("#E60000"));
 
         // Pick a non-repeating personalized thank-you message
         if (displayedRescueMessage == null) {
@@ -133,10 +167,10 @@ public class ResultActivity extends AppCompatActivity {
 
         tvRescueMessage.setVisibility(View.VISIBLE);
         tvRescueMessage.setText("\"" + displayedRescueMessage + "\"");
-        tvRescueMessage.setTextColor(Color.parseColor("#DDDDDD"));
+        tvRescueMessage.setTextColor(Color.WHITE);
 
         tvResultWord.setText("THE WORD REVEALED: " + word);
-        tvResultWord.setTextColor(Color.parseColor("#888888"));
+        tvResultWord.setTextColor(Color.parseColor("#FFD54F"));
 
         tvBaseScore.setText("RITUAL BASE: " + getIntent().getIntExtra("BASE", 0));
         tvAccuracyBonus.setText("ACCURACY REWARD: " + getIntent().getIntExtra("ACCURACY", 0));
@@ -156,12 +190,32 @@ public class ResultActivity extends AppCompatActivity {
         tvAccuracyBonus.setVisibility(View.GONE);
         tvTimeBonus.setVisibility(View.GONE);
 
+        // Realistic horror atmosphere: blurred glowing eyes and bats swooping in background
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.start();
+        }
+
+        // 3D Spatial blood splash towards screen + dripping down
+        if (bloodSplashOverlay != null) {
+            bloodSplashOverlay.setVisibility(View.VISIBLE);
+            bloodSplashOverlay.splashTowardsCamera();
+        }
+        soundManager.playBloodSplashSound();
+
         final Handler handler = new Handler(Looper.getMainLooper());
         String failureMessage = FAILURE_MESSAGES[new Random().nextInt(FAILURE_MESSAGES.length)];
 
         handler.postDelayed(() -> {
+            Typeface horrorFont = ResourcesCompat.getFont(this, R.font.ghastly_panic);
+
+            // Much larger "TOO LATE." in horror font with crimson glow
             tvResultTitle.setText("TOO LATE.");
-            tvResultTitle.setTextColor(Color.parseColor("#8B0000"));
+            tvResultTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 88);
+            if (horrorFont != null) {
+                tvResultTitle.setTypeface(horrorFont);
+            }
+            tvResultTitle.setTextColor(Color.parseColor("#FF3333"));
+            tvResultTitle.setShadowLayer(25, 0, 0, Color.parseColor("#E60000"));
             tvResultTitle.setAlpha(0f);
             tvResultTitle.setVisibility(View.VISIBLE);
             contentLayout.setVisibility(View.VISIBLE);
@@ -172,8 +226,15 @@ public class ResultActivity extends AppCompatActivity {
             soundManager.playWrong();
 
             handler.postDelayed(() -> {
+                // Guilt message in horror font in pure white
                 tvResultWord.setText(failureMessage);
-                tvResultWord.setTextColor(Color.parseColor("#8B0000"));
+                if (horrorFont != null) {
+                    tvResultWord.setTypeface(horrorFont);
+                }
+                tvResultWord.setTextColor(Color.WHITE);
+                tvResultWord.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+                tvResultWord.setLetterSpacing(0.06f);
+                tvResultWord.setShadowLayer(14, 0, 0, Color.parseColor("#CC0000"));
                 tvResultWord.setAlpha(0f);
                 tvResultWord.setVisibility(View.VISIBLE);
                 
@@ -181,12 +242,25 @@ public class ResultActivity extends AppCompatActivity {
                 soundManager.playHeartbeat(2);
 
                 handler.postDelayed(() -> {
-                    tvFinalScore.setText("THE WORD WAS: " + word);
-                    tvFinalScore.setTextColor(Color.WHITE);
+                    // Hide empty stats divider on failure
+                    View divider = findViewById(R.id.scoreDivider);
+                    if (divider != null) divider.setVisibility(View.GONE);
+
+                    // Substantially enlarged answer reveal
+                    tvFinalScore.setText("THE WORD WAS : " + word);
+                    tvFinalScore.setTextColor(Color.parseColor("#FFD54F"));
+                    if (horrorFont != null) {
+                        tvFinalScore.setTypeface(horrorFont);
+                        tvFinalScore.setTextSize(TypedValue.COMPLEX_UNIT_SP, 42);
+                    } else {
+                        tvFinalScore.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
+                    }
+                    tvFinalScore.setLetterSpacing(0.12f);
+                    tvFinalScore.setShadowLayer(24, 0, 0, Color.parseColor("#E60000"));
                     tvFinalScore.setAlpha(0f);
                     tvFinalScore.setVisibility(View.VISIBLE);
                     
-                    tvFinalScore.animate().alpha(1f).setDuration(1000).start();
+                    tvFinalScore.animate().alpha(1f).scaleX(1.05f).scaleY(1.05f).setDuration(1000).start();
                     AnimationHelper.glitchView(tvFinalScore);
 
                     handler.postDelayed(() -> {
@@ -218,12 +292,18 @@ public class ResultActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.stop();
+        }
         soundManager.stopAmbientAtmosphere();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.stop();
+        }
         soundManager.stopAmbientAtmosphere();
     }
 }

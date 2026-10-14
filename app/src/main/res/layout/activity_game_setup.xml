@@ -3,8 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pure_dark"
-    android:padding="24dp">
+    android:background="@color/pure_dark">
+
+    <!-- Atmospheric Horror Bats & Glowing Eyes Background -->
+    <com.example.lastword.utils.HorrorAtmosphereView
+        android:id="@+id/horrorAtmosphereView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Ambient Blood Splatters on Wall Background -->
+    <com.example.lastword.utils.BloodSplashOverlayView
+        android:id="@+id/bloodSplashOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Top Left Quick Back Button -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@drawable/bg_button_dark"
+        android:contentDescription="Return"
+        android:padding="10dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tvSetupTitle"
@@ -12,19 +45,22 @@
         android:layout_height="wrap_content"
         android:text="CHOOSE YOUR FATE"
         android:textColor="@color/horror_red"
-        android:textSize="46sp"
+        android:textSize="44sp"
         android:textStyle="bold"
-        android:letterSpacing="0.1"
-        android:layout_marginTop="30dp"
+        android:letterSpacing="0.12"
+        android:layout_marginTop="52dp"
+        android:fontFamily="@font/ghastly_panic"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" android:fontFamily="@font/ghastly_panic" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/tvSetupTitle"
         app:layout_constraintBottom_toTopOf="@+id/btnEnterRoom"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,16 +69,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_vertical">
 
             <!-- Category Section -->
-            <TextView android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SELECT CATEGORY"
-                android:textColor="@color/pale_white"
-                android:textSize="32sp"
-                android:letterSpacing="0.05"
+                android:textColor="@color/horror_red"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"
+                android:letterSpacing="0.08"
                 android:layout_marginBottom="8dp"/>
 
             <RadioGroup
@@ -52,13 +91,16 @@
                 android:orientation="vertical"
                 android:background="@drawable/bg_horror_card"
                 android:padding="12dp"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="20dp">
 
                 <RadioButton
                     android:id="@+id/rbAnimals"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:text="ANIMALS"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"
                     android:checked="true"/>
@@ -68,6 +110,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:text="HORROR MOVIES"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"/>
 
@@ -76,18 +121,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:text="CELEBRITIES"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"/>
             </RadioGroup>
 
             <!-- Difficulty Section -->
-            <TextView android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SELECT TARGET SACRIFICE (DIFFICULTY)"
-                android:textColor="@color/pale_white"
-                android:textSize="32sp"
-                android:letterSpacing="0.05"
+                android:text="SELECT DIFFICULTY"
+                android:textColor="@color/horror_red"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"
+                android:letterSpacing="0.08"
                 android:layout_marginBottom="8dp"/>
 
             <RadioGroup
@@ -97,13 +147,16 @@
                 android:orientation="vertical"
                 android:background="@drawable/bg_horror_card"
                 android:padding="12dp"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="20dp">
 
                 <RadioButton
                     android:id="@+id/rbEasy"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="EASY - ANIMAL SACRIFICE"
+                    android:text="EASY - LONGER TETHER (WITH HINTS)"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"
                     android:checked="true"/>
@@ -112,7 +165,10 @@
                     android:id="@+id/rbIntermediate"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="INTERMEDIATE - ADULT STRANGER"
+                    android:text="MEDIUM - STANDARD SACRIFICE"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"/>
 
@@ -120,19 +176,24 @@
                     android:id="@+id/rbHard"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="HARD - INNOCENT CHILD (PSYCHOLOGICAL DREAD)"
+                    android:text="HARD - PSYCHOLOGICAL DREAD"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"/>
             </RadioGroup>
 
             <!-- Mode Section -->
-            <TextView android:fontFamily="@font/ghastly_panic"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SELECT RITUAL MODE"
-                android:textColor="@color/pale_white"
-                android:textSize="32sp"
-                android:letterSpacing="0.05"
+                android:textColor="@color/horror_red"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"
+                android:letterSpacing="0.08"
                 android:layout_marginBottom="8dp"/>
 
             <RadioGroup
@@ -149,6 +210,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:text="CLASSIC (ATTEMPTS LIMIT ONLY)"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"
                     android:checked="true"/>
@@ -158,6 +222,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:text="TIMER MODE (TICKING DEATH)"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"/>
             </RadioGroup>
@@ -167,15 +234,19 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnEnterRoom"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="54dp"
         android:text="ENTER THE ROOM"
         android:textColor="@color/white"
-        android:textSize="28sp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"
+        android:letterSpacing="0.08"
         android:background="@drawable/bg_button_dark"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

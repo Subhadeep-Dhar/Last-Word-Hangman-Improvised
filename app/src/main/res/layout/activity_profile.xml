@@ -3,8 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pure_dark"
-    android:padding="20dp">
+    android:background="@color/pure_dark">
+
+    <!-- Top Left Quick Back Button -->
+    <ImageButton
+        android:id="@+id/btnTopBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@drawable/bg_button_dark"
+        android:contentDescription="Return"
+        android:padding="10dp"
+        android:layout_marginTop="52dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tvStatsTitle"
@@ -15,15 +28,16 @@
         android:textSize="44sp"
         android:textStyle="bold"
         android:letterSpacing="0.1"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="54dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:fontFamily="@font/ghastly_panic" />
 
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
         app:layout_constraintTop_toBottomOf="@id/tvStatsTitle"
@@ -41,10 +55,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="OVERVIEW"
-                android:textColor="@color/dim_gray"
-                android:textSize="26sp"
+                android:textColor="@color/horror_red"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:letterSpacing="0.1"
-                android:fontFamily="@font/ghastly_panic"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginBottom="6dp" />
 
             <LinearLayout
@@ -62,21 +77,23 @@
                     android:layout_height="wrap_content"
                     android:text="GAMES PLAYED: 0"
                     android:textColor="@color/white"
-                    android:textSize="28sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="6dp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="8dp" />
 
                 <TextView
                     android:id="@+id/tvPrimarySaved"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="LIVES SAVED: 0"
-                    android:textColor="@color/pale_white"
-                    android:textSize="28sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="6dp" />
+                    android:textColor="#81C784"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="8dp" />
 
                 <TextView
                     android:id="@+id/tvPrimaryKills"
@@ -84,10 +101,11 @@
                     android:layout_height="wrap_content"
                     android:text="KILLS CAUSED: 0"
                     android:textColor="@color/horror_red"
-                    android:textSize="28sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="6dp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="8dp" />
 
                 <TextView
                     android:id="@+id/tvPrimaryStreak"
@@ -95,9 +113,10 @@
                     android:layout_height="wrap_content"
                     android:text="CURRENT STREAK: 0"
                     android:textColor="@color/amber_glow"
-                    android:textSize="28sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic" />
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed" />
             </LinearLayout>
 
             <!-- Secondary Summary -->
@@ -105,10 +124,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ALL-TIME RECORDS"
-                android:textColor="@color/dim_gray"
-                android:textSize="26sp"
+                android:textColor="@color/horror_red"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:letterSpacing="0.1"
-                android:fontFamily="@font/ghastly_panic"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginBottom="6dp" />
 
             <LinearLayout
@@ -126,31 +146,34 @@
                     android:layout_height="wrap_content"
                     android:text="HIGHEST SCORE: 0"
                     android:textColor="@color/amber_glow"
-                    android:textSize="26sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="6dp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="8dp" />
 
                 <TextView
                     android:id="@+id/tvSecondaryTotalScore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="TOTAL SCORE: 0"
-                    android:textColor="@color/pale_white"
-                    android:textSize="26sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="6dp" />
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="8dp" />
 
                 <TextView
                     android:id="@+id/tvSecondaryBestStreak"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="HIGHEST STREAK: 0"
-                    android:textColor="@color/white"
-                    android:textSize="26sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic" />
+                    android:textColor="@color/amber_glow"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed" />
             </LinearLayout>
 
             <!-- Detailed Breakdown (9 Combinations via Compact Selectors) -->
@@ -158,10 +181,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="CATEGORY &amp; DIFFICULTY BREAKDOWN"
-                android:textColor="@color/dim_gray"
-                android:textSize="26sp"
+                android:textColor="@color/horror_red"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:letterSpacing="0.1"
-                android:fontFamily="@font/ghastly_panic"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginBottom="6dp" />
 
             <LinearLayout
@@ -205,21 +229,23 @@
                     android:layout_height="wrap_content"
                     android:text="GAMES PLAYED: 0"
                     android:textColor="@color/white"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
                     android:id="@+id/tvBreakdownSaved"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="LIVES SAVED: 0"
-                    android:textColor="@color/pale_white"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="4dp" />
+                    android:textColor="#81C784"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
                     android:id="@+id/tvBreakdownKills"
@@ -227,21 +253,23 @@
                     android:layout_height="wrap_content"
                     android:text="KILLS CAUSED: 0"
                     android:textColor="@color/horror_red"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
                     android:id="@+id/tvBreakdownTotalScore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="TOTAL SCORE: 0"
-                    android:textColor="@color/pale_white"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="4dp" />
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
                     android:id="@+id/tvBreakdownHighScore"
@@ -249,10 +277,11 @@
                     android:layout_height="wrap_content"
                     android:text="HIGHEST SCORE: 0"
                     android:textColor="@color/amber_glow"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
                     android:id="@+id/tvBreakdownCurrentStreak"
@@ -260,20 +289,22 @@
                     android:layout_height="wrap_content"
                     android:text="CURRENT STREAK: 0"
                     android:textColor="@color/white"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed"
+                    android:layout_marginBottom="6dp" />
 
                 <TextView
                     android:id="@+id/tvBreakdownHighestStreak"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="HIGHEST STREAK: 0"
-                    android:textColor="@color/white"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.1"
-                    android:fontFamily="@font/ghastly_panic" />
+                    android:textColor="@color/amber_glow"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:fontFamily="sans-serif-condensed" />
             </LinearLayout>
 
         </LinearLayout>
@@ -281,12 +312,17 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnBack"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:text="RETURN TO SURFACE"
         android:textColor="@color/pale_white"
-        android:textSize="28sp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"
+        android:letterSpacing="0.08"
         android:background="@drawable/bg_button_dark"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

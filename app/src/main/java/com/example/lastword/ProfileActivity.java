@@ -60,11 +60,15 @@ public class ProfileActivity extends AppCompatActivity {
         tvBreakdownHighestStreak = findViewById(R.id.tvBreakdownHighestStreak);
 
         btnBack = findViewById(R.id.btnBack);
+        View btnTopBack = findViewById(R.id.btnTopBack);
 
-        btnBack.setOnClickListener(v -> {
+        View.OnClickListener backListener = v -> {
             soundManager.playClick();
             finish();
-        });
+        };
+
+        if (btnBack != null) btnBack.setOnClickListener(backListener);
+        if (btnTopBack != null) btnTopBack.setOnClickListener(backListener);
 
         setupSpinners();
         loadStats();
@@ -124,8 +128,15 @@ public class ProfileActivity extends AppCompatActivity {
         spDifficulty.setAdapter(diffAdapter);
 
         AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
+            private int initialTriggers = 2;
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (initialTriggers > 0) {
+                    initialTriggers--;
+                } else {
+                    soundManager.playClick();
+                }
                 updateBreakdown();
             }
 

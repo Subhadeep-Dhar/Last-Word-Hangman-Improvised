@@ -18,11 +18,15 @@ public class InstructionsActivity extends AppCompatActivity {
         soundManager = new SoundManager(this);
         AnimationHelper.enableImmersiveSticky(this);
         btnBack = findViewById(R.id.btnBack);
+        android.view.View btnTopBack = findViewById(R.id.btnTopBack);
 
-        btnBack.setOnClickListener(v -> {
+        android.view.View.OnClickListener backListener = v -> {
             soundManager.playClick();
             finish();
-        });
+        };
+
+        if (btnBack != null) btnBack.setOnClickListener(backListener);
+        if (btnTopBack != null) btnTopBack.setOnClickListener(backListener);
     }
 
     @Override

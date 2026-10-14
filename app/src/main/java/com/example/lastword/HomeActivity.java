@@ -26,6 +26,8 @@ public class HomeActivity extends AppCompatActivity {
     private View flickerOverlay;
     private SoundManager soundManager;
     private GameStatsRepository gameStatsRepo;
+    private com.example.lastword.utils.HorrorAtmosphereView horrorAtmosphereView;
+    private com.example.lastword.utils.BloodSplashOverlayView bloodSplashOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,16 @@ public class HomeActivity extends AppCompatActivity {
 
         AnimationHelper.startFlickerSystem(flickerOverlay);
         AnimationHelper.enableImmersiveSticky(this);
+
+        bloodSplashOverlay = findViewById(R.id.bloodSplashOverlay);
+        if (bloodSplashOverlay != null) {
+            bloodSplashOverlay.setAsBackgroundAtmosphere(true);
+        }
+        horrorAtmosphereView = findViewById(R.id.horrorAtmosphereView);
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.start();
+        }
+
         updateUI();
 
         // 1. Play Game
@@ -93,18 +105,27 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         AnimationHelper.enableImmersiveSticky(this);
         soundManager.startMenuAtmosphere();
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.start();
+        }
         updateUI();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.stop();
+        }
         soundManager.stopAmbientAtmosphere();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.stop();
+        }
         soundManager.stopAmbientAtmosphere();
     }
 
@@ -120,7 +141,10 @@ public class HomeActivity extends AppCompatActivity {
                     .setTitle("DAILY RITUAL COMPLETE")
                     .setMessage("You have already faced the tether for " + todayDate + ".\n\nOutcome: " + outcome +
                             "\n\nA new daily sacrifice awakens at midnight.")
-                    .setPositiveButton("RETURN TO SURFACE", (d, which) -> d.dismiss())
+                    .setPositiveButton("RETURN TO SURFACE", (d, which) -> {
+                        soundManager.playClick();
+                        d.dismiss();
+                    })
                     .create();
             dialog.show();
             if (dialog.getWindow() != null) {
@@ -156,6 +180,6 @@ public class HomeActivity extends AppCompatActivity {
     private void updateUI() {
         GameStatsRepository.GameStats stats = gameStatsRepo.getOverallStats();
         tvFooterGames.setText("RITUALS: " + stats.gamesPlayed + " | SAVED: " + stats.livesSaved + " | KILLS: " + stats.kills);
-        tvFooterStreak.setText("STREAK: " + stats.currentWinningStreak + " | HIGH SCORE: " + stats.highestScore);
+        tvFooterStreak.setText("STREAK: " + stats.currentWinningStreak + " | HIGHEST SCORE: " + stats.highestScore);
     }
 }

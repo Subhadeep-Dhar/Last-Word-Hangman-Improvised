@@ -13,4 +13,5 @@
     <color name="pale_white">#DDDDDD</color>
     <color name="white">#FFFFFF</color>
     <color name="amber_glow">#CC8400</color>
+    <color name="crimson_border">#448B0000</color>
 </resources>

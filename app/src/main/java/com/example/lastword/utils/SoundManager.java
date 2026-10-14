@@ -24,6 +24,24 @@ public class SoundManager {
     private String currentDifficulty = "EASY";
     private Handler fadeHandler = new Handler(Looper.getMainLooper());
 
+    // Precomputed 35ms tactile switch click PCM buffer (16kHz 16-bit mono)
+    private static final byte[] CLICK_PCM;
+    static {
+        int sampleRate = 16000;
+        int numSamples = (int) (sampleRate * 0.035);
+        CLICK_PCM = new byte[numSamples * 2];
+        int idx = 0;
+        for (int i = 0; i < numSamples; i++) {
+            double t = (double) i / sampleRate;
+            // Scaled to 40% volume as requested
+            double val = (Math.sin(2 * Math.PI * 1500 * t) * Math.exp(-t * 260) * 0.75
+                       + Math.sin(2 * Math.PI * 400 * t) * Math.exp(-t * 180) * 0.25) * 0.40;
+            short sVal = (short) (val * 32767);
+            CLICK_PCM[idx++] = (byte) (sVal & 0x00ff);
+            CLICK_PCM[idx++] = (byte) ((sVal & 0xff00) >>> 8);
+        }
+    }
+
     // Human screaming and crying pool (animal screams, whimpers, and cries completely removed)
     private final int[] humanScreamsAndCries = {
         R.raw.adult_screem_1, R.raw.adult_screem_2, R.raw.adult_screem_3,
@@ -90,10 +108,58 @@ public class SoundManager {
     public void playClick() {
         if (!prefs.isSoundEnabled()) return;
         try {
-            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
-            tg.startTone(ToneGenerator.TONE_PROP_PROMPT, 60);
-            vibrate(25);
-            new Handler(Looper.getMainLooper()).postDelayed(tg::release, 100);
+            AudioTrack track = new AudioTrack(AudioManager.STREAM_MUSIC,
+                    16000, AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, CLICK_PCM.length,
+                    AudioTrack.MODE_STATIC);
+            track.write(CLICK_PCM, 0, CLICK_PCM.length);
+            track.play();
+            vibrate(20);
+            new Handler(Looper.getMainLooper()).postDelayed(track::release, 120);
+        } catch (Exception ignored) {
+            try {
+                ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 16);
+                tg.startTone(ToneGenerator.TONE_PROP_PROMPT, 50);
+                vibrate(20);
+                new Handler(Looper.getMainLooper()).postDelayed(tg::release, 90);
+            } catch (Exception ignored2) {}
+        }
+    }
+
+    public void playBloodSplashSound() {
+        if (!prefs.isSoundEnabled()) return;
+        try {
+            int sampleRate = 16000;
+            int numSamples = (int) (sampleRate * 0.18);
+            byte[] splashPcm = new byte[numSamples * 2];
+            int idx = 0;
+            java.util.Random r = new java.util.Random();
+            for (int i = 0; i < numSamples; i++) {
+                double t = (double) i / sampleRate;
+                double thud = Math.sin(2 * Math.PI * (85 - 35 * t) * t) * Math.exp(-t * 30) * 0.7;
+                double splatter = (r.nextDouble() * 2.0 - 1.0) * Math.exp(-t * 20) * 0.3;
+                double val = (thud + splatter) * 0.75;
+                short sVal = (short) (val * 32767);
+                splashPcm[idx++] = (byte) (sVal & 0x00ff);
+                splashPcm[idx++] = (byte) ((sVal & 0xff00) >>> 8);
+            }
+            AudioTrack track = new AudioTrack(AudioManager.STREAM_MUSIC,
+                    sampleRate, AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, splashPcm.length,
+                    AudioTrack.MODE_STATIC);
+            track.write(splashPcm, 0, splashPcm.length);
+            track.play();
+            vibrate(90);
+            new Handler(Looper.getMainLooper()).postDelayed(track::release, 260);
+        } catch (Exception ignored) {}
+    }
+
+    public void playFilamentBuzz() {
+        if (!prefs.isSoundEnabled()) return;
+        try {
+            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 35);
+            tg.startTone(ToneGenerator.TONE_CDMA_KEYPAD_VOLUME_KEY_LITE, 40);
+            new Handler(Looper.getMainLooper()).postDelayed(tg::release, 60);
         } catch (Exception ignored) {}
     }
 
@@ -115,6 +181,61 @@ public class SoundManager {
             vibrate(90);
             new Handler(Looper.getMainLooper()).postDelayed(tg::release, 350);
         } catch (Exception ignored) {}
+    }
+
+    public void startHorrorWindyAmbience() {
+        if (!prefs.isMusicEnabled()) return;
+        if (isAmbientPlaying) return;
+        isAmbientPlaying = true;
+
+        ambientThread = new Thread(() -> {
+            int sampleRate = 11025;
+            int numSamples = sampleRate * 6; // 6-second seamless wind loop
+            double[] sample = new double[numSamples];
+            byte[] generatedSnd = new byte[2 * numSamples];
+            java.util.Random rand = new java.util.Random(42);
+
+            for (int i = 0; i < numSamples; ++i) {
+                double t = (double) i / sampleRate;
+
+                // Subterranean sub-bass drone
+                double sub = Math.sin(2 * Math.PI * 36.0 * t) * 0.4
+                           + Math.sin(2 * Math.PI * 52.0 * t) * 0.2;
+
+                // Gusting howling cold wind with wandering pitch
+                double gustEnv = 0.5 + 0.5 * Math.sin(2 * Math.PI * 0.25 * t);
+                double howlFreq = 260.0 + 80.0 * Math.sin(2 * Math.PI * 0.35 * t);
+                double howl = Math.sin(2 * Math.PI * howlFreq * t) * 0.3 * gustEnv;
+
+                // Cold chilling draft noise
+                double noise = (rand.nextDouble() * 2.0 - 1.0) * 0.18 * gustEnv;
+
+                sample[i] = (sub * 0.4 + howl * 0.4 + noise * 0.2) * 0.42;
+            }
+
+            int idx = 0;
+            for (final double dVal : sample) {
+                final short val = (short) (dVal * 32767);
+                generatedSnd[idx++] = (byte) (val & 0x00ff);
+                generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+            }
+
+            try {
+                ambientTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                        sampleRate, AudioFormat.CHANNEL_OUT_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
+                        AudioTrack.MODE_STATIC);
+                ambientTrack.write(generatedSnd, 0, generatedSnd.length);
+                ambientTrack.setLoopPoints(0, numSamples, -1);
+
+                if (isAmbientPlaying && ambientTrack != null) {
+                    ambientTrack.play();
+                }
+            } catch (Exception e) {
+                isAmbientPlaying = false;
+            }
+        });
+        ambientThread.start();
     }
 
     public void startMenuAtmosphere() {
@@ -197,6 +318,38 @@ public class SoundManager {
             ambientThread.interrupt();
             ambientThread = null;
         }
+    }
+
+    public synchronized void fadeOutAmbientAtmosphere(long durationMs, final Runnable onComplete) {
+        if (!isAmbientPlaying || ambientTrack == null) {
+            stopAmbientAtmosphere();
+            if (onComplete != null) onComplete.run();
+            return;
+        }
+
+        final AudioTrack track = ambientTrack;
+        new Handler(Looper.getMainLooper()).post(() -> {
+            android.animation.ValueAnimator anim = android.animation.ValueAnimator.ofFloat(1.0f, 0f);
+            anim.setDuration(durationMs);
+            anim.addUpdateListener(a -> {
+                try {
+                    float v = (float) a.getAnimatedValue();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        track.setVolume(v);
+                    } else {
+                        track.setStereoVolume(v, v);
+                    }
+                } catch (Exception ignored) {}
+            });
+            anim.addListener(new android.animation.AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(android.animation.Animator animation) {
+                    stopAmbientAtmosphere();
+                    if (onComplete != null) onComplete.run();
+                }
+            });
+            anim.start();
+        });
     }
 
     private void playFadingSound(int rawResId, float maxVolume) {

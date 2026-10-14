@@ -72,6 +72,14 @@ public class SettingsActivity extends AppCompatActivity {
             soundManager.playClick();
             finish();
         });
+
+        android.view.View btnTopBack = findViewById(R.id.btnTopBack);
+        if (btnTopBack != null) {
+            btnTopBack.setOnClickListener(v -> {
+                soundManager.playClick();
+                finish();
+            });
+        }
     }
 
     private void showResetConfirmationDialog() {

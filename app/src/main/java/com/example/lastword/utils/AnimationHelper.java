@@ -221,17 +221,29 @@ public class AnimationHelper {
     public static void enableImmersiveSticky(android.app.Activity activity) {
         if (activity == null || activity.getWindow() == null) return;
         android.view.Window window = activity.getWindow();
+
+        // 1. Extend into display cutout (camera notch / punch-hole) so game is never letterboxed
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            android.view.WindowManager.LayoutParams lp = window.getAttributes();
+            lp.layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            window.setAttributes(lp);
+        }
+
+        // 2. Immersive edge-to-edge: hide both status bar and navigation bar with transient swipe
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false);
             android.view.WindowInsetsController controller = window.getInsetsController();
             if (controller != null) {
-                controller.hide(android.view.WindowInsets.Type.statusBars());
+                controller.hide(android.view.WindowInsets.Type.systemBars());
                 controller.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
         } else {
             window.getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             );
         }

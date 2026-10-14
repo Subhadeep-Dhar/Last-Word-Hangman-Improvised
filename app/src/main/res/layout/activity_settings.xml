@@ -3,8 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pure_dark"
-    android:padding="24dp">
+    android:background="@color/pure_dark">
+
+    <!-- Top Left Quick Back Button -->
+    <ImageButton
+        android:id="@+id/btnTopBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@drawable/bg_button_dark"
+        android:contentDescription="Return"
+        android:padding="10dp"
+        android:layout_marginTop="52dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tvSettingsTitle"
@@ -15,18 +28,20 @@
         android:textSize="46sp"
         android:textStyle="bold"
         android:letterSpacing="0.1"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="54dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" android:fontFamily="@font/ghastly_panic" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="@font/ghastly_panic" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/bg_horror_card"
         android:padding="20dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="20dp"
         app:layout_constraintTop_toBottomOf="@id/tvSettingsTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -36,7 +51,10 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="AMBIENT ATMOSPHERE DRONE (MUSIC)"
-            android:textColor="@color/pale_white"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
             android:buttonTint="@color/horror_red"
             android:checked="true"/>
 
@@ -45,7 +63,10 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="TACTILE FEEDBACK TONES (SOUND EFFECTS)"
-            android:textColor="@color/pale_white"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
             android:buttonTint="@color/horror_red"
             android:checked="true"/>
 
@@ -54,7 +75,10 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="PULSE INDUCTION (VIBRATION)"
-            android:textColor="@color/pale_white"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
             android:buttonTint="@color/horror_red"
             android:checked="true"/>
 
@@ -63,14 +87,17 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="ABSOLUTE COLD DARK ROOMS (DARK THEME)"
-            android:textColor="@color/pale_white"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
             android:buttonTint="@color/horror_red"
             android:checked="true"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/dim_gray"
+            android:background="@color/crimson_border"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"/>
 
@@ -80,17 +107,26 @@
             android:layout_height="50dp"
             android:text="RESET ALL GAME DATA"
             android:textColor="@color/horror_red"
-            android:textSize="24sp"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
+            android:letterSpacing="0.08"
             android:background="@drawable/bg_button_dark"/>
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnBack"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:text="RETURN TO SURFACE"
         android:textColor="@color/pale_white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"
+        android:letterSpacing="0.08"
         android:background="@drawable/bg_button_dark"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

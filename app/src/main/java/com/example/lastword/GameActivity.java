@@ -7,6 +7,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
@@ -42,6 +43,8 @@ public class GameActivity extends AppCompatActivity {
     private FrameLayout horrorFrame;
     private GridLayout glAlphabetKeyboard;
     private HangmanView hangmanView;
+    private com.example.lastword.utils.BloodSplashOverlayView bloodSplashOverlay;
+    private com.example.lastword.utils.HorrorAtmosphereView horrorAtmosphereView;
 
     private PreferencesManager prefs;
     private SoundManager soundManager;
@@ -86,6 +89,19 @@ public class GameActivity extends AppCompatActivity {
         horrorFrame = findViewById(R.id.horrorFrame);
         glAlphabetKeyboard = findViewById(R.id.glAlphabetKeyboard);
         hangmanView = findViewById(R.id.hangmanView);
+        bloodSplashOverlay = findViewById(R.id.bloodSplashOverlay);
+        horrorAtmosphereView = findViewById(R.id.horrorAtmosphereView);
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.start();
+        }
+
+        View btnGameBack = findViewById(R.id.btnGameBack);
+        if (btnGameBack != null) {
+            btnGameBack.setOnClickListener(v -> {
+                soundManager.playClick();
+                finish();
+            });
+        }
 
         setupGame();
         AnimationHelper.enableImmersiveSticky(this);
@@ -111,9 +127,9 @@ public class GameActivity extends AppCompatActivity {
 
         String displayDiff = GameStatsRepository.normalizeDifficulty(difficulty);
         if (isDailyChallenge) {
-            tvGameCategory.setText("DAILY RITUAL: " + category + " / " + displayDiff);
+            tvGameCategory.setText("DAILY • " + displayDiff);
         } else {
-            tvGameCategory.setText("DESTINATION: " + category + " / " + displayDiff);
+            tvGameCategory.setText(category.replace("_", " ") + " • " + displayDiff);
         }
 
         tvHiddenWord.setText(formatWord(displayedWord.toString()));
@@ -141,6 +157,10 @@ public class GameActivity extends AppCompatActivity {
             tvGameTimer.setVisibility(View.GONE);
         }
 
+        if (bloodSplashOverlay != null) {
+            bloodSplashOverlay.clearBlood();
+        }
+
         createKeyboard();
         updateHorrorEnvironment();
     }
@@ -152,7 +172,7 @@ public class GameActivity extends AppCompatActivity {
                 if (isGameOver) return;
                 timeRemainingMillis = millisUntilFinished;
                 int seconds = (int) (millisUntilFinished / 1000);
-                tvGameTimer.setText("REMAINING: " + seconds + "s");
+                tvGameTimer.setText("TIME: " + seconds + "s");
 
                 if (seconds <= 10 && seconds > 5) {
                     tvGameTimer.setTextColor(Color.parseColor("#CC8400"));
@@ -173,7 +193,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 if (!isGameOver) {
-                    tvGameTimer.setText("REMAINING: 0s");
+                    tvGameTimer.setText("TIME: 0s");
                     triggerFailure("THE CLOCK STOPPED.");
                 }
             }
@@ -183,23 +203,64 @@ public class GameActivity extends AppCompatActivity {
     private void createKeyboard() {
         glAlphabetKeyboard.removeAllViews();
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int btnHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 46, getResources().getDisplayMetrics());
+        int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, getResources().getDisplayMetrics());
+
         for (int i = 0; i < alphabet.length(); i++) {
             final char letter = alphabet.charAt(i);
+            int row = i / 7;
+            int col = i % 7;
+
+            if (row == 3) {
+                if (i == 21) {
+                    // Explicit left spacer so V-Z are perfectly centered
+                    android.widget.Space leftSpacer = new android.widget.Space(this);
+                    GridLayout.LayoutParams spacerParams = new GridLayout.LayoutParams();
+                    spacerParams.width = 0;
+                    spacerParams.height = btnHeight;
+                    spacerParams.rowSpec = GridLayout.spec(3, 1);
+                    spacerParams.columnSpec = GridLayout.spec(0, 1, 1f);
+                    spacerParams.setMargins(margin, margin, margin, margin);
+                    leftSpacer.setLayoutParams(spacerParams);
+                    glAlphabetKeyboard.addView(leftSpacer);
+                }
+                col = (i - 21) + 1;
+            }
+
             Button btn = new Button(this);
             btn.setText(String.valueOf(letter));
             btn.setTextColor(Color.WHITE);
+            btn.setTextSize(16f);
+            btn.setTypeface(null, android.graphics.Typeface.BOLD);
             btn.setBackgroundResource(R.drawable.bg_button_dark);
             btn.setPadding(0, 0, 0, 0);
 
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
-            params.height = 120;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-            params.setMargins(6, 6, 6, 6);
+            params.height = btnHeight;
+            params.rowSpec = GridLayout.spec(row, 1);
+            params.columnSpec = GridLayout.spec(col, 1, 1f);
+            params.setMargins(margin, margin, margin, margin);
             btn.setLayoutParams(params);
 
-            btn.setOnClickListener(v -> handleLetterGuess(letter, btn));
+            btn.setOnClickListener(v -> {
+                soundManager.playClick();
+                handleLetterGuess(letter, btn);
+            });
             glAlphabetKeyboard.addView(btn);
+
+            if (i == 25) {
+                // Explicit right spacer so row 3 has balanced margins
+                android.widget.Space rightSpacer = new android.widget.Space(this);
+                GridLayout.LayoutParams spacerParams = new GridLayout.LayoutParams();
+                spacerParams.width = 0;
+                spacerParams.height = btnHeight;
+                spacerParams.rowSpec = GridLayout.spec(3, 1);
+                spacerParams.columnSpec = GridLayout.spec(6, 1, 1f);
+                spacerParams.setMargins(margin, margin, margin, margin);
+                rightSpacer.setLayoutParams(spacerParams);
+                glAlphabetKeyboard.addView(rightSpacer);
+            }
         }
     }
 
@@ -222,40 +283,46 @@ public class GameActivity extends AppCompatActivity {
             checkWin();
         } else {
             isProcessingGuess = true;
+
+            // 1. IMMEDIATE FEEDBACK (0ms delay): Instant red screen shockwave & progressive redness
+            if (bloodSplashOverlay != null) {
+                bloodSplashOverlay.triggerRedMistakeFlash(horrorState + 1);
+            }
+            soundManager.playWrong();
+            soundManager.playMistakeSound();
+            soundManager.vibrate(120);
+            AnimationHelper.shakeView(horrorFrame, horrorState + 1);
+            tvHorrorStatusText.setText("WRONG.");
+            tvHorrorStatusText.setTextColor(Color.RED);
+
             final Handler pacedHandler = new Handler(Looper.getMainLooper());
-            
+
+            // 2. Visceral procedural blood splash animated right onto the glass
             pacedHandler.postDelayed(() -> {
-                tvHorrorStatusText.setText("WRONG.");
-                tvHorrorStatusText.setTextColor(Color.RED);
-                
+                if (bloodSplashOverlay != null) {
+                    bloodSplashOverlay.splashBlood(horrorState + 1);
+                    soundManager.playBloodSplashSound();
+                }
+            }, 100);
+
+            // 3. Decrement chances and update horror atmosphere
+            pacedHandler.postDelayed(() -> {
+                attemptsLeft--;
+                horrorState++;
+                updateAttemptsUI();
+
                 pacedHandler.postDelayed(() -> {
-                    soundManager.playWrong();
-                    soundManager.playMistakeSound();
-                    AnimationHelper.shakeView(horrorFrame, horrorState + 1);
-                    AnimationHelper.triggerSingleFlicker(gameFlickerOverlay);
-                    soundManager.vibrate(100);
-
-                    pacedHandler.postDelayed(() -> {
-                        attemptsLeft--;
-                        horrorState++;
-                        updateAttemptsUI();
-                        
-                        pacedHandler.postDelayed(() -> {
-                            updateHorrorEnvironment();
-                            isProcessingGuess = false;
-                            checkLoss();
-                        }, 500);
-
-                    }, 400);
-
-                }, 400);
+                    updateHorrorEnvironment();
+                    isProcessingGuess = false;
+                    checkLoss();
+                }, 350);
 
             }, 300);
         }
     }
 
     private void updateAttemptsUI() {
-        tvGameAttempts.setText("TETHER: " + attemptsLeft);
+        tvGameAttempts.setText("CHANCES: " + attemptsLeft);
         if (attemptsLeft <= 2) {
             tvGameAttempts.setTextColor(Color.RED);
             AnimationHelper.heartbeatPulse(tvGameAttempts, 1.15f);
@@ -269,7 +336,7 @@ public class GameActivity extends AppCompatActivity {
         
         horrorEnvironmentView.setBackgroundColor(bgColor);
         vignetteOverlay.setAlpha(Math.min(vignetteAlpha, 1.0f));
-        tvHorrorStatusText.setTextColor(Color.parseColor("#888888"));
+        tvHorrorStatusText.setTextColor(Color.parseColor("#FF6666"));
         
         if (hangmanView != null) {
             hangmanView.setMistakes(horrorState);
@@ -327,15 +394,10 @@ public class GameActivity extends AppCompatActivity {
             }
             glAlphabetKeyboard.animate().alpha(0.3f).setDuration(400).start();
 
-            // Transition the Hangman character into the rescued/freed state
-            if (hangmanView != null) {
-                hangmanView.setFreed(true);
-            }
-
             soundManager.stopAmbientAtmosphere();
-            tvHorrorStatusText.setText("THE ROPE SNAPPED. THEY ARE FREE.");
+            tvHorrorStatusText.setText("THE ROPE SNAPPED. THEY ARE COMING DOWN...");
             tvHorrorStatusText.setTextColor(Color.WHITE);
-            AnimationHelper.heartbeatPulse(tvHorrorStatusText, 1.1f);
+            AnimationHelper.heartbeatPulse(tvHorrorStatusText, 1.15f);
             
             String normDiff = GameStatsRepository.normalizeDifficulty(difficulty);
             int baseScore = normDiff.equals("EASY") ? 100 : (normDiff.equals("HARD") ? 500 : 250);
@@ -346,22 +408,46 @@ public class GameActivity extends AppCompatActivity {
             // Authoritative, transaction-safe local persistence
             gameStatsRepo.recordGameResult(gameId, category, normDiff, mode, true, score, isDailyChallenge, dailyDate);
             
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            // Execute the realistic hangman descent saving animation
+            if (hangmanView != null) {
+                hangmanView.startRescueAnimation(() -> {
+                    tvHorrorStatusText.setText("THEY ARE SAVED.");
+                    soundManager.playVictorySound();
+
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        Intent intent = new Intent(GameActivity.this, ResultActivity.class);
+                        intent.putExtra("GAME_ID", gameId);
+                        intent.putExtra("WON", true);
+                        intent.putExtra("WORD", targetWord);
+                        intent.putExtra("SCORE", score);
+                        intent.putExtra("BASE", baseScore);
+                        intent.putExtra("ACCURACY", accuracyBonus);
+                        intent.putExtra("TIME_BONUS", timeBonus);
+                        intent.putExtra("CATEGORY", category);
+                        intent.putExtra("DIFFICULTY", normDiff);
+                        intent.putExtra("IS_DAILY", isDailyChallenge);
+                        startActivity(intent);
+                        finish();
+                    }, 800);
+                });
+            } else {
                 soundManager.playVictorySound();
-                Intent intent = new Intent(GameActivity.this, ResultActivity.class);
-                intent.putExtra("GAME_ID", gameId);
-                intent.putExtra("WON", true);
-                intent.putExtra("WORD", targetWord);
-                intent.putExtra("SCORE", score);
-                intent.putExtra("BASE", baseScore);
-                intent.putExtra("ACCURACY", accuracyBonus);
-                intent.putExtra("TIME_BONUS", timeBonus);
-                intent.putExtra("CATEGORY", category);
-                intent.putExtra("DIFFICULTY", normDiff);
-                intent.putExtra("IS_DAILY", isDailyChallenge);
-                startActivity(intent);
-                finish();
-            }, 1200);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    Intent intent = new Intent(GameActivity.this, ResultActivity.class);
+                    intent.putExtra("GAME_ID", gameId);
+                    intent.putExtra("WON", true);
+                    intent.putExtra("WORD", targetWord);
+                    intent.putExtra("SCORE", score);
+                    intent.putExtra("BASE", baseScore);
+                    intent.putExtra("ACCURACY", accuracyBonus);
+                    intent.putExtra("TIME_BONUS", timeBonus);
+                    intent.putExtra("CATEGORY", category);
+                    intent.putExtra("DIFFICULTY", normDiff);
+                    intent.putExtra("IS_DAILY", isDailyChallenge);
+                    startActivity(intent);
+                    finish();
+                }, 1200);
+            }
         }
     }
 
@@ -426,6 +512,9 @@ public class GameActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         AnimationHelper.enableImmersiveSticky(this);
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.start();
+        }
         if (!isGameOver && attemptsLeft > 0) {
             soundManager.startAmbientAtmosphere();
         }
@@ -434,12 +523,18 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.stop();
+        }
         soundManager.stopAmbientAtmosphere();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (horrorAtmosphereView != null) {
+            horrorAtmosphereView.stop();
+        }
         if (gameTimer != null) gameTimer.cancel();
         soundManager.stopAmbientAtmosphere();
     }
