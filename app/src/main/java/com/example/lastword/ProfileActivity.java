@@ -2,38 +2,63 @@ package com.example.lastword;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.lastword.data.PreferencesManager;
+import com.example.lastword.data.GameStatsRepository;
+import com.example.lastword.utils.AnimationHelper;
 import com.example.lastword.utils.SoundManager;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class ProfileActivity extends AppCompatActivity {
-    private TextView tvUsernameLabel, tvPlayed, tvWins, tvLosses, tvWinRate, tvBestScore, tvStreak;
-    private LinearLayout achievementsContainer;
+    private TextView tvPrimaryGames, tvPrimarySaved, tvPrimaryKills, tvPrimaryStreak;
+    private TextView tvSecondaryHighScore, tvSecondaryTotalScore, tvSecondaryBestStreak;
+    private TextView tvBreakdownGames, tvBreakdownSaved, tvBreakdownKills, tvBreakdownTotalScore;
+    private TextView tvBreakdownHighScore, tvBreakdownCurrentStreak, tvBreakdownHighestStreak;
+    private Spinner spCategory, spDifficulty;
     private Button btnBack;
-    private PreferencesManager prefs;
+
+    private GameStatsRepository gameStatsRepo;
     private SoundManager soundManager;
+
+    private final String[] categories = {"ANIMALS", "HORROR MOVIES", "CELEBRITIES"};
+    private final String[] difficulties = {"EASY", "MEDIUM", "HARD"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        prefs = new PreferencesManager(this);
+        gameStatsRepo = GameStatsRepository.getInstance(this);
         soundManager = new SoundManager(this);
+        AnimationHelper.enableImmersiveSticky(this);
 
-        tvUsernameLabel = findViewById(R.id.tvUsernameLabel);
-        tvPlayed = findViewById(R.id.tvPlayed);
-        tvWins = findViewById(R.id.tvWins);
-        tvLosses = findViewById(R.id.tvLosses);
-        tvWinRate = findViewById(R.id.tvWinRate);
-        tvBestScore = findViewById(R.id.tvBestScore);
-        tvStreak = findViewById(R.id.tvStreak);
-        achievementsContainer = findViewById(R.id.achievementsContainer);
+        tvPrimaryGames = findViewById(R.id.tvPrimaryGames);
+        tvPrimarySaved = findViewById(R.id.tvPrimarySaved);
+        tvPrimaryKills = findViewById(R.id.tvPrimaryKills);
+        tvPrimaryStreak = findViewById(R.id.tvPrimaryStreak);
+
+        tvSecondaryHighScore = findViewById(R.id.tvSecondaryHighScore);
+        tvSecondaryTotalScore = findViewById(R.id.tvSecondaryTotalScore);
+        tvSecondaryBestStreak = findViewById(R.id.tvSecondaryBestStreak);
+
+        spCategory = findViewById(R.id.spCategory);
+        spDifficulty = findViewById(R.id.spDifficulty);
+
+        tvBreakdownGames = findViewById(R.id.tvBreakdownGames);
+        tvBreakdownSaved = findViewById(R.id.tvBreakdownSaved);
+        tvBreakdownKills = findViewById(R.id.tvBreakdownKills);
+        tvBreakdownTotalScore = findViewById(R.id.tvBreakdownTotalScore);
+        tvBreakdownHighScore = findViewById(R.id.tvBreakdownHighScore);
+        tvBreakdownCurrentStreak = findViewById(R.id.tvBreakdownCurrentStreak);
+        tvBreakdownHighestStreak = findViewById(R.id.tvBreakdownHighestStreak);
+
         btnBack = findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(v -> {
@@ -41,54 +66,129 @@ public class ProfileActivity extends AppCompatActivity {
             finish();
         });
 
-        loadUserData();
+        setupSpinners();
+        loadStats();
     }
 
-    private void loadUserData() {
-        String username = prefs.getCurrentUser();
-        if (username == null) return;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AnimationHelper.enableImmersiveSticky(this);
+        soundManager.startMenuAtmosphere();
+        loadStats();
+    }
 
-        tvUsernameLabel.setText("SUBJECT ID: " + username.toUpperCase());
-        JSONObject user = prefs.getUserData(username);
-        if (user != null) {
-            int played = user.optInt("played", 0);
-            int wins = user.optInt("wins", 0);
-            int losses = user.optInt("losses", 0); 
-            int highScore = user.optInt("highScore", 0);
-            int streak = user.optInt("streak", 0);
-
-            tvPlayed.setText("RITUALS PERFORMED: " + played);
-            tvWins.setText("ESSENCES SAVED: " + wins);
-            // Phase 19: Unified terminology
-            tvLosses.setText("VICTIM LOSSES: " + losses);
-            
-            int rate = played > 0 ? (wins * 100 / played) : 0;
-            tvWinRate.setText("STABILITY RATE: " + rate + "%");
-            tvBestScore.setText("HIGHEST RESONANCE: " + highScore);
-            tvStreak.setText("RESCUE STREAK: " + streak);
-
-            JSONArray achs = user.optJSONArray("achievements");
-            achievementsContainer.removeAllViews();
-            
-            if (achs != null && achs.length() > 0) {
-                for (int i = 0; i < achs.length(); i++) {
-                    String achName = achs.optString(i);
-                    TextView tv = new TextView(this);
-                    tv.setText("• MARK OF " + achName.replace("_", " "));
-                    tv.setTextColor(Color.parseColor("#8B0000"));
-                    tv.setTextSize(14);
-                    tv.setPadding(0, 8, 0, 8);
-                    tv.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-                    achievementsContainer.addView(tv);
-                }
-            } else {
-                TextView tv = new TextView(this);
-                tv.setText("No marks etched upon this soul.");
-                tv.setTextColor(Color.DKGRAY);
+    private void setupSpinners() {
+        ArrayAdapter<String> catAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                TextView tv = (TextView) super.getView(position, convertView, parent);
+                tv.setTextColor(Color.WHITE);
                 tv.setTextSize(14);
-                tv.setPadding(0, 16, 0, 0);
-                achievementsContainer.addView(tv);
+                return tv;
             }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                TextView tv = (TextView) super.getDropDownView(position, convertView, parent);
+                tv.setTextColor(Color.WHITE);
+                tv.setBackgroundColor(Color.parseColor("#141414"));
+                tv.setPadding(24, 24, 24, 24);
+                return tv;
+            }
+        };
+        catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spCategory.setAdapter(catAdapter);
+
+        ArrayAdapter<String> diffAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, difficulties) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                TextView tv = (TextView) super.getView(position, convertView, parent);
+                tv.setTextColor(Color.WHITE);
+                tv.setTextSize(14);
+                return tv;
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                TextView tv = (TextView) super.getDropDownView(position, convertView, parent);
+                tv.setTextColor(Color.WHITE);
+                tv.setBackgroundColor(Color.parseColor("#141414"));
+                tv.setPadding(24, 24, 24, 24);
+                return tv;
+            }
+        };
+        diffAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spDifficulty.setAdapter(diffAdapter);
+
+        AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updateBreakdown();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        };
+
+        spCategory.setOnItemSelectedListener(listener);
+        spDifficulty.setOnItemSelectedListener(listener);
+    }
+
+    private void loadStats() {
+        // Load Primary & Secondary summaries
+        GameStatsRepository.GameStats overall = gameStatsRepo.getOverallStats();
+
+        tvPrimaryGames.setText("GAMES PLAYED: " + overall.gamesPlayed);
+        tvPrimarySaved.setText("LIVES SAVED: " + overall.livesSaved);
+        tvPrimaryKills.setText("KILLS CAUSED: " + overall.kills);
+        tvPrimaryStreak.setText("CURRENT STREAK: " + overall.currentWinningStreak);
+
+        tvSecondaryHighScore.setText("HIGHEST SCORE: " + overall.highestScore);
+        tvSecondaryTotalScore.setText("TOTAL SCORE: " + overall.totalScore);
+        tvSecondaryBestStreak.setText("HIGHEST STREAK: " + overall.highestWinningStreak);
+
+        updateBreakdown();
+    }
+
+    private void updateBreakdown() {
+        String cat = (String) spCategory.getSelectedItem();
+        String diff = (String) spDifficulty.getSelectedItem();
+
+        if (cat == null) cat = "ANIMALS";
+        if (diff == null) diff = "EASY";
+
+        GameStatsRepository.GameStats breakdown = gameStatsRepo.getCategoryDifficultyStats(cat, diff);
+
+        tvBreakdownGames.setText("GAMES PLAYED: " + breakdown.gamesPlayed);
+        tvBreakdownSaved.setText("LIVES SAVED: " + breakdown.livesSaved);
+        tvBreakdownKills.setText("KILLS CAUSED: " + breakdown.kills);
+        tvBreakdownTotalScore.setText("TOTAL SCORE: " + breakdown.totalScore);
+        tvBreakdownHighScore.setText("HIGHEST SCORE: " + breakdown.highestScore);
+        tvBreakdownCurrentStreak.setText("CURRENT STREAK: " + breakdown.currentWinningStreak);
+        tvBreakdownHighestStreak.setText("HIGHEST STREAK: " + breakdown.highestWinningStreak);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            AnimationHelper.enableImmersiveSticky(this);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        soundManager.stopAmbientAtmosphere();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        soundManager.stopAmbientAtmosphere();
     }
 }

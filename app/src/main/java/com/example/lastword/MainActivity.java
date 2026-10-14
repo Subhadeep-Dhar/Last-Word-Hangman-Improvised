@@ -23,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
         prefs = new PreferencesManager(this);
         soundManager = new SoundManager(this);
 
+        AnimationHelper.enableImmersiveSticky(this);
+        soundManager.startMenuAtmosphere();
+
         TextView tvTitle = findViewById(R.id.tvSplashTitle);
         TextView tvSub = findViewById(R.id.tvSplashSub);
         View flicker = findViewById(R.id.flickerOverlay);
@@ -39,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
                     AnimationHelper.triggerSingleFlicker(flicker);
                     
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                        // Route to Login
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        // Route directly to HomeActivity (Main Landing Page)
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                         startActivity(intent);
                         finish();
                         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -48,5 +51,25 @@ public class MainActivity extends AppCompatActivity {
                 }, 1000);
             }, 1000);
         }, 500);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            AnimationHelper.enableImmersiveSticky(this);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        soundManager.stopAmbientAtmosphere();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        soundManager.stopAmbientAtmosphere();
     }
 }

@@ -4,142 +4,291 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/pure_dark"
-    android:padding="24dp">
+    android:padding="20dp">
 
     <TextView
-        android:id="@+id/tvProfileTitle"
+        android:id="@+id/tvStatsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SOUL RECORD"
+        android:text="SCORE &amp; STATS"
         android:textColor="@color/horror_red"
-        android:textSize="46sp"
+        android:textSize="44sp"
         android:textStyle="bold"
         android:letterSpacing="0.1"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" android:fontFamily="@font/ghastly_panic" />
-
-    <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
-        android:id="@+id/tvUsernameLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Subject: Unknown"
-        android:textColor="@color/white"
-        android:textSize="38sp"
-        android:textStyle="bold"
-        android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/tvProfileTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <LinearLayout
-        android:id="@+id/statsCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/bg_horror_card"
-        android:padding="16dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/tvUsernameLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
-            android:id="@+id/tvPlayed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="RITUALS PERFORMED: 0"
-            android:textColor="@color/pale_white"
-            android:textSize="32sp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
-            android:id="@+id/tvWins"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SOULS SAVED: 0"
-            android:textColor="@color/pale_white"
-            android:textSize="32sp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
-            android:id="@+id/tvLosses"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TOTAL SACRIFICES / KILLS CAUSED: 0"
-            android:textColor="@color/horror_red"
-            android:textSize="32sp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
-            android:id="@+id/tvWinRate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SURVIVAL RATE: 0%"
-            android:textColor="@color/pale_white"
-            android:textSize="32sp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
-            android:id="@+id/tvBestScore"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="HIGHEST RITUAL RESONANCE: 0"
-            android:textColor="@color/amber_glow"
-            android:textSize="32sp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
-            android:id="@+id/tvStreak"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CURRENT SAVING STREAK: 0"
-            android:textColor="@color/pale_white"
-            android:textSize="32sp"/>
-    </LinearLayout>
-
-    <TextView android:fontFamily="@font/ghastly_panic"
-        android:id="@+id/tvAchievementsLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="UNLOCKED MARKS (ACHIEVEMENTS)"
-        android:textColor="@color/dim_gray"
-        android:textSize="31sp"
-        android:letterSpacing="0.05"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/statsCard"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="@font/ghastly_panic" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvAchievementsLabel"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvStatsTitle"
         app:layout_constraintBottom_toTopOf="@+id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:id="@+id/achievementsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <!-- Dynamically populated or custom hardcoded items for stability -->
+
+            <!-- Primary Summary -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OVERVIEW"
+                android:textColor="@color/dim_gray"
+                android:textSize="26sp"
+                android:letterSpacing="0.1"
+                android:fontFamily="@font/ghastly_panic"
+                android:layout_marginBottom="6dp" />
+
+            <LinearLayout
+                android:id="@+id/cardPrimaryStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_horror_card"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tvPrimaryGames"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GAMES PLAYED: 0"
+                    android:textColor="@color/white"
+                    android:textSize="28sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvPrimarySaved"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="LIVES SAVED: 0"
+                    android:textColor="@color/pale_white"
+                    android:textSize="28sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvPrimaryKills"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="KILLS CAUSED: 0"
+                    android:textColor="@color/horror_red"
+                    android:textSize="28sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvPrimaryStreak"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CURRENT STREAK: 0"
+                    android:textColor="@color/amber_glow"
+                    android:textSize="28sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic" />
+            </LinearLayout>
+
+            <!-- Secondary Summary -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ALL-TIME RECORDS"
+                android:textColor="@color/dim_gray"
+                android:textSize="26sp"
+                android:letterSpacing="0.1"
+                android:fontFamily="@font/ghastly_panic"
+                android:layout_marginBottom="6dp" />
+
+            <LinearLayout
+                android:id="@+id/cardSecondaryStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_horror_card"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tvSecondaryHighScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="HIGHEST SCORE: 0"
+                    android:textColor="@color/amber_glow"
+                    android:textSize="26sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvSecondaryTotalScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TOTAL SCORE: 0"
+                    android:textColor="@color/pale_white"
+                    android:textSize="26sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvSecondaryBestStreak"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="HIGHEST STREAK: 0"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic" />
+            </LinearLayout>
+
+            <!-- Detailed Breakdown (9 Combinations via Compact Selectors) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CATEGORY &amp; DIFFICULTY BREAKDOWN"
+                android:textColor="@color/dim_gray"
+                android:textSize="26sp"
+                android:letterSpacing="0.1"
+                android:fontFamily="@font/ghastly_panic"
+                android:layout_marginBottom="6dp" />
+
+            <LinearLayout
+                android:id="@+id/cardBreakdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_horror_card"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_marginBottom="12dp">
+
+                    <Spinner
+                        android:id="@+id/spCategory"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_dark"
+                        android:layout_marginEnd="6dp"
+                        android:popupBackground="@color/pure_dark" />
+
+                    <Spinner
+                        android:id="@+id/spDifficulty"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_dark"
+                        android:layout_marginStart="6dp"
+                        android:popupBackground="@color/pure_dark" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvBreakdownGames"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GAMES PLAYED: 0"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBreakdownSaved"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="LIVES SAVED: 0"
+                    android:textColor="@color/pale_white"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBreakdownKills"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="KILLS CAUSED: 0"
+                    android:textColor="@color/horror_red"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBreakdownTotalScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TOTAL SCORE: 0"
+                    android:textColor="@color/pale_white"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBreakdownHighScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="HIGHEST SCORE: 0"
+                    android:textColor="@color/amber_glow"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBreakdownCurrentStreak"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CURRENT STREAK: 0"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBreakdownHighestStreak"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="HIGHEST STREAK: 0"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="@font/ghastly_panic" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
-    <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnBack"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="RETURN TO SURFACE"
         android:textColor="@color/pale_white"
+        android:textSize="28sp"
         android:background="@drawable/bg_button_dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

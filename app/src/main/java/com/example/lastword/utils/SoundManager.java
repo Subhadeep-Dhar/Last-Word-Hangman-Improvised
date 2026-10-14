@@ -24,14 +24,11 @@ public class SoundManager {
     private String currentDifficulty = "EASY";
     private Handler fadeHandler = new Handler(Looper.getMainLooper());
 
-    private final int[] adultScreams = {
-        R.raw.adult_screem_1, R.raw.adult_screem_2, R.raw.adult_screem_3, R.raw.adult_screem_4, R.raw.adult_screem_5
-    };
-    private final int[] childCries = {
+    // Human screaming and crying pool (animal screams, whimpers, and cries completely removed)
+    private final int[] humanScreamsAndCries = {
+        R.raw.adult_screem_1, R.raw.adult_screem_2, R.raw.adult_screem_3,
+        R.raw.adult_screem_4, R.raw.adult_screem_5,
         R.raw.baby_crying_9, R.raw.baby_crying_10
-    };
-    private final int[] animalWhimpers = {
-        R.raw.animal_cying_6, R.raw.animal_cying_7, R.raw.animal_cying_8
     };
 
     public void setDifficulty(String difficulty) {
@@ -63,16 +60,39 @@ public class SoundManager {
                     v.vibrate(duration);
                 }
             }
-        } catch (SecurityException ignored) {
-            // Permission might still be missing in some edge cases or manifest sync issues
-        }
+        } catch (Exception ignored) {}
+    }
+
+    public void playHeartbeat(int intensity) {
+        if (!prefs.isSoundEnabled()) return;
+        try {
+            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
+            int tone = ToneGenerator.TONE_PROP_BEEP;
+            if (intensity == 2) tone = ToneGenerator.TONE_PROP_BEEP2;
+            else if (intensity >= 3) tone = ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE;
+
+            tg.startTone(tone, 150);
+            vibrate(50);
+            new Handler(Looper.getMainLooper()).postDelayed(tg::release, 300);
+        } catch (Exception ignored) {}
+    }
+
+    public void playGlitch() {
+        if (!prefs.isSoundEnabled()) return;
+        try {
+            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
+            tg.startTone(ToneGenerator.TONE_CDMA_NETWORK_USA_RINGBACK, 80);
+            vibrate(30);
+            new Handler(Looper.getMainLooper()).postDelayed(tg::release, 150);
+        } catch (Exception ignored) {}
     }
 
     public void playClick() {
         if (!prefs.isSoundEnabled()) return;
         try {
-            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 25);
-            tg.startTone(ToneGenerator.TONE_PROP_ACK, 40);
+            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
+            tg.startTone(ToneGenerator.TONE_PROP_PROMPT, 60);
+            vibrate(25);
             new Handler(Looper.getMainLooper()).postDelayed(tg::release, 100);
         } catch (Exception ignored) {}
     }
@@ -81,7 +101,8 @@ public class SoundManager {
         if (!prefs.isSoundEnabled()) return;
         try {
             ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
-            tg.startTone(ToneGenerator.TONE_CDMA_PIP, 60);
+            tg.startTone(ToneGenerator.TONE_PROP_ACK, 100);
+            vibrate(40);
             new Handler(Looper.getMainLooper()).postDelayed(tg::release, 200);
         } catch (Exception ignored) {}
     }
@@ -89,37 +110,24 @@ public class SoundManager {
     public void playWrong() {
         if (!prefs.isSoundEnabled()) return;
         try {
-            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 90);
-            tg.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 350);
-            new Handler(Looper.getMainLooper()).postDelayed(tg::release, 500);
+            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
+            tg.startTone(ToneGenerator.TONE_PROP_NACK, 250);
+            vibrate(90);
+            new Handler(Looper.getMainLooper()).postDelayed(tg::release, 350);
         } catch (Exception ignored) {}
     }
 
-    public void playHeartbeat(int intensity) {
-        if (!prefs.isSoundEnabled()) return;
-        try {
-            int toneType = ToneGenerator.TONE_CDMA_KEYPAD_VOLUME_KEY_LITE;
-            if ("HARD".equals(currentDifficulty)) {
-                toneType = ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE; // Higher pitch for child
-            } else if ("EASY".equals(currentDifficulty)) {
-                toneType = ToneGenerator.TONE_CDMA_LOW_PBX_L; // Lower pitch for animal
-            }
-            final int finalToneType = toneType;
-
-            final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 35 + (intensity * 12));
-            tg.startTone(finalToneType, 100);
-            vibrate(50);
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                try {
-                    tg.startTone(finalToneType, 100);
-                    vibrate(40);
-                    new Handler(Looper.getMainLooper()).postDelayed(tg::release, 150);
-                } catch (Exception ignored) {}
-            }, 220);
-        } catch (Exception ignored) {}
+    public void startMenuAtmosphere() {
+        // Lower volume ambient drone for home/landing and other screens
+        startAmbientAtmosphere(0.15f);
     }
 
     public void startAmbientAtmosphere() {
+        // In-game ambient drone
+        startAmbientAtmosphere(0.35f);
+    }
+
+    public synchronized void startAmbientAtmosphere(final float volumeScale) {
         if (!prefs.isMusicEnabled()) return;
         if (isAmbientPlaying) return;
         isAmbientPlaying = true;
@@ -134,8 +142,8 @@ public class SoundManager {
                 double t = (double) i / sampleRate;
                 
                 double baseFreq = 40.0;
-                if ("HARD".equals(currentDifficulty)) baseFreq = 60.0; // Higher frequency
-                else if ("EASY".equals(currentDifficulty)) baseFreq = 30.0; // Deep growl freq
+                if ("HARD".equalsIgnoreCase(currentDifficulty)) baseFreq = 55.0;
+                else if ("EASY".equalsIgnoreCase(currentDifficulty)) baseFreq = 32.0;
 
                 double wave = Math.sin(2 * Math.PI * baseFreq * t) * 0.6;
                 wave += Math.sin(2 * Math.PI * (baseFreq + 1.2) * t) * 0.4;
@@ -143,11 +151,11 @@ public class SoundManager {
                 
                 // Slow volume breathe
                 double lfo = 0.7 + 0.3 * Math.sin(2 * Math.PI * 0.15 * t);
-                sample[i] = wave * lfo * 0.35;
+                sample[i] = wave * lfo * volumeScale;
                 
-                // Random dust/static
+                // Random subtle static
                 if (Math.random() > 0.9998) {
-                    sample[i] += (Math.random() * 0.5 - 0.25);
+                    sample[i] += (Math.random() * 0.4 - 0.2);
                 }
             }
 
@@ -176,7 +184,7 @@ public class SoundManager {
         ambientThread.start();
     }
 
-    public void stopAmbientAtmosphere() {
+    public synchronized void stopAmbientAtmosphere() {
         isAmbientPlaying = false;
         if (ambientTrack != null) {
             try {
@@ -245,13 +253,9 @@ public class SoundManager {
     public void playMistakeSound() {
         if (!prefs.isSoundEnabled()) return;
         try {
-            int rawResId = adultScreams[(int)(Math.random() * adultScreams.length)];
-            if ("HARD".equals(currentDifficulty)) {
-                rawResId = childCries[(int)(Math.random() * childCries.length)];
-            } else if ("EASY".equals(currentDifficulty)) {
-                rawResId = animalWhimpers[(int)(Math.random() * animalWhimpers.length)];
-            }
-            playFadingSound(rawResId, 0.3f); // Lower volume (0.3) for mistake
+            int rawResId = humanScreamsAndCries[(int)(Math.random() * humanScreamsAndCries.length)];
+            // Strict 40% volume cap for screaming and crying
+            playFadingSound(rawResId, 0.40f);
         } catch (Exception ignored) {}
     }
 
@@ -259,13 +263,9 @@ public class SoundManager {
         stopAmbientAtmosphere();
         if (!prefs.isSoundEnabled()) return;
         try {
-            int rawResId = adultScreams[(int)(Math.random() * adultScreams.length)];
-            if ("HARD".equals(currentDifficulty)) {
-                rawResId = childCries[(int)(Math.random() * childCries.length)];
-            } else if ("EASY".equals(currentDifficulty)) {
-                rawResId = animalWhimpers[(int)(Math.random() * animalWhimpers.length)];
-            }
-            playFadingSound(rawResId, 0.6f); // Slightly louder for full failure
+            int rawResId = humanScreamsAndCries[(int)(Math.random() * humanScreamsAndCries.length)];
+            // Strict 40% volume cap for screaming and crying
+            playFadingSound(rawResId, 0.40f);
             vibrate(1000);
         } catch (Exception ignored) {}
     }
@@ -274,7 +274,7 @@ public class SoundManager {
         stopAmbientAtmosphere();
         if (!prefs.isSoundEnabled()) return;
         try {
-            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 50);
+            ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
             tg.startTone(ToneGenerator.TONE_PROP_PROMPT, 1000);
             new Handler(Looper.getMainLooper()).postDelayed(tg::release, 1200);
         } catch (Exception ignored) {}

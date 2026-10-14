@@ -64,10 +64,10 @@
                     android:checked="true"/>
 
                 <RadioButton
-                    android:id="@+id/rbObjects"
+                    android:id="@+id/rbHorrorMovies"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="OBJECTS"
+                    android:text="HORROR MOVIES"
                     android:textColor="@color/white"
                     android:buttonTint="@color/horror_red"/>
 

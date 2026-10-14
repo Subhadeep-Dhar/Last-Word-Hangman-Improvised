@@ -107,25 +107,43 @@
         android:id="@+id/tvHiddenWord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="24dp"
         android:text="_ _ _ _ _"
         android:textColor="@color/white"
-        android:textSize="42sp"
+        android:textSize="40sp"
         android:letterSpacing="0.25"
         android:gravity="center"
-        
         app:layout_constraintTop_toBottomOf="@id/horrorFrame"
-        app:layout_constraintStart_toStartOf="parent"  android:fontFamily="@font/ghastly_panic" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="@font/ghastly_panic" />
+
+    <!-- Easy Mode Hint / Clue -->
+    <TextView
+        android:id="@+id/tvGameHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="CLUE: ..."
+        android:textColor="@color/pale_white"
+        android:textSize="22sp"
+        android:letterSpacing="0.05"
+        android:gravity="center"
+        android:visibility="gone"
+        android:fontFamily="@font/ghastly_panic"
+        app:layout_constraintTop_toBottomOf="@id/tvHiddenWord"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Keyboard -->
     <GridLayout
         android:id="@+id/glAlphabetKeyboard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:columnCount="7"
         android:alignmentMode="alignBounds"
-        app:layout_constraintTop_toBottomOf="@id/tvHiddenWord"
+        app:layout_constraintTop_toBottomOf="@id/tvGameHint"
         app:layout_constraintBottom_toTopOf="@id/bottomStatsBar"
         app:layout_constraintStart_toStartOf="parent">
         <!-- Buttons injected programmatically -->

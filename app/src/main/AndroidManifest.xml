@@ -24,14 +24,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".SignupActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".HomeActivity" android:exported="false" />
         <activity android:name=".GameSetupActivity" android:exported="false" />
         <activity android:name=".GameActivity" android:exported="false" />
         <activity android:name=".ResultActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
-        <activity android:name=".LeaderboardActivity" android:exported="false" />
         <activity android:name=".InstructionsActivity" android:exported="false" />
         <activity android:name=".SettingsActivity" android:exported="false" />
 

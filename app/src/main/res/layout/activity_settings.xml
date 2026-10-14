@@ -71,14 +71,16 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/dim_gray"
-            android:layout_marginVertical="16dp"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
 
-        <androidx.appcompat.widget.AppCompatButton android:textSize="28sp"
-            android:id="@+id/btnLogout"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnResetData"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SEVER SUBJECT SESSION (LOGOUT)"
-            android:textColor="@color/white"
+            android:layout_height="50dp"
+            android:text="RESET ALL GAME DATA"
+            android:textColor="@color/horror_red"
+            android:textSize="24sp"
             android:background="@drawable/bg_button_dark"/>
     </LinearLayout>
 

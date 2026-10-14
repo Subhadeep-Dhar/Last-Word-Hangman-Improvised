@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.lastword.data.GameStatsRepository;
 import com.example.lastword.data.PreferencesManager;
 import com.example.lastword.data.WordRepository;
 import com.example.lastword.utils.AnimationHelper;
@@ -21,9 +21,14 @@ import com.example.lastword.utils.SoundManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GameActivity extends AppCompatActivity {
     private String category, difficulty, mode, targetWord;
+    private boolean isDailyChallenge = false;
+    private String dailyDate = null;
+    private String gameId;
+
     private StringBuilder displayedWord;
     private int attemptsLeft = 6;
     private int horrorState = 0;
@@ -32,7 +37,7 @@ public class GameActivity extends AppCompatActivity {
     private CountDownTimer gameTimer;
     private List<Character> guessedLetters = new ArrayList<>();
 
-    private TextView tvGameCategory, tvGameAttempts, tvGameTimer, tvHiddenWord, tvHorrorStatusText;
+    private TextView tvGameCategory, tvGameAttempts, tvGameTimer, tvHiddenWord, tvHorrorStatusText, tvGameHint;
     private View horrorEnvironmentView, vignetteOverlay, gameFlickerOverlay;
     private FrameLayout horrorFrame;
     private GridLayout glAlphabetKeyboard;
@@ -40,6 +45,7 @@ public class GameActivity extends AppCompatActivity {
 
     private PreferencesManager prefs;
     private SoundManager soundManager;
+    private GameStatsRepository gameStatsRepo;
     private boolean isGameOver = false;
     private boolean isProcessingGuess = false;
 
@@ -50,20 +56,30 @@ public class GameActivity extends AppCompatActivity {
 
         prefs = new PreferencesManager(this);
         soundManager = new SoundManager(this);
+        gameStatsRepo = GameStatsRepository.getInstance(this);
+        gameId = UUID.randomUUID().toString();
 
         category = getIntent().getStringExtra("CATEGORY");
         difficulty = getIntent().getStringExtra("DIFFICULTY");
         mode = getIntent().getStringExtra("MODE");
+        isDailyChallenge = getIntent().getBooleanExtra("IS_DAILY", false);
+        dailyDate = getIntent().getStringExtra("DAILY_DATE");
 
         if (category == null) category = "ANIMALS";
         if (difficulty == null) difficulty = "EASY";
         if (mode == null) mode = "CLASSIC";
+
+        // Daily Challenge always uses Medium difficulty
+        if (isDailyChallenge) {
+            difficulty = "MEDIUM";
+        }
 
         tvGameCategory = findViewById(R.id.tvGameCategory);
         tvGameAttempts = findViewById(R.id.tvGameAttempts);
         tvGameTimer = findViewById(R.id.tvGameTimer);
         tvHiddenWord = findViewById(R.id.tvHiddenWord);
         tvHorrorStatusText = findViewById(R.id.tvHorrorStatusText);
+        tvGameHint = findViewById(R.id.tvGameHint);
         horrorEnvironmentView = findViewById(R.id.horrorEnvironmentView);
         vignetteOverlay = findViewById(R.id.vignetteOverlay);
         gameFlickerOverlay = findViewById(R.id.gameFlickerOverlay);
@@ -72,22 +88,45 @@ public class GameActivity extends AppCompatActivity {
         hangmanView = findViewById(R.id.hangmanView);
 
         setupGame();
+        AnimationHelper.enableImmersiveSticky(this);
         soundManager.startAmbientAtmosphere();
         AnimationHelper.startFlickerSystem(gameFlickerOverlay);
         AnimationHelper.fadeIn(findViewById(R.id.gameRootLayout), 1500);
     }
 
     private void setupGame() {
-        targetWord = WordRepository.getRandomWord(category);
+        soundManager.setDifficulty(difficulty);
+        String customWord = getIntent().getStringExtra("TARGET_WORD");
+        if (customWord != null && !customWord.trim().isEmpty()) {
+            targetWord = customWord.trim().toUpperCase();
+        } else {
+            targetWord = WordRepository.getRandomWord(category, difficulty);
+        }
+
         displayedWord = new StringBuilder();
         for (int i = 0; i < targetWord.length(); i++) {
             if (targetWord.charAt(i) == ' ') displayedWord.append(" ");
             else displayedWord.append("_");
         }
 
-        tvGameCategory.setText("DESTINATION: " + category + " / " + difficulty);
+        String displayDiff = GameStatsRepository.normalizeDifficulty(difficulty);
+        if (isDailyChallenge) {
+            tvGameCategory.setText("DAILY RITUAL: " + category + " / " + displayDiff);
+        } else {
+            tvGameCategory.setText("DESTINATION: " + category + " / " + displayDiff);
+        }
+
         tvHiddenWord.setText(formatWord(displayedWord.toString()));
         updateAttemptsUI();
+
+        // Clue visibility: Only in EASY mode for normal games, never in Medium, Hard, or Daily Challenge
+        if ("EASY".equalsIgnoreCase(difficulty) && !isDailyChallenge) {
+            tvGameHint.setVisibility(View.VISIBLE);
+            tvGameHint.setText("CLUE: " + WordRepository.getHint(category, targetWord));
+        } else {
+            tvGameHint.setVisibility(View.GONE);
+            tvGameHint.setText("");
+        }
         
         if (hangmanView != null) {
             hangmanView.setDifficulty(difficulty);
@@ -237,8 +276,9 @@ public class GameActivity extends AppCompatActivity {
         }
 
         String msg = "THEY ARE STILL WAITING.";
+        String normDiff = GameStatsRepository.normalizeDifficulty(difficulty);
         
-        if ("EASY".equals(difficulty)) {
+        if ("EASY".equals(normDiff)) {
             switch (horrorState) {
                 case 1: msg = "The creature stopped moving."; AnimationHelper.glitchView(tvHorrorStatusText); break;
                 case 2: msg = "It's watching the dark now."; soundManager.playHeartbeat(1); break;
@@ -246,7 +286,7 @@ public class GameActivity extends AppCompatActivity {
                 case 4: msg = "Panicked breathing echoes."; soundManager.playHeartbeat(2); break;
                 case 5: msg = "One more mistake. It's almost gone."; break;
             }
-        } else if ("INTERMEDIATE".equals(difficulty)) {
+        } else if ("MEDIUM".equals(normDiff)) {
             switch (horrorState) {
                 case 1: msg = "The figure shifted its weight."; AnimationHelper.triggerSingleFlicker(gameFlickerOverlay); break;
                 case 2: msg = "Did they just stand up?"; soundManager.playHeartbeat(1); break;
@@ -280,26 +320,48 @@ public class GameActivity extends AppCompatActivity {
         if (!displayedWord.toString().contains("_")) {
             isGameOver = true;
             if (gameTimer != null) gameTimer.cancel();
+
+            // Disable all keyboard keys to prevent any further input
+            for (int i = 0; i < glAlphabetKeyboard.getChildCount(); i++) {
+                glAlphabetKeyboard.getChildAt(i).setEnabled(false);
+            }
+            glAlphabetKeyboard.animate().alpha(0.3f).setDuration(400).start();
+
+            // Transition the Hangman character into the rescued/freed state
+            if (hangmanView != null) {
+                hangmanView.setFreed(true);
+            }
+
+            soundManager.stopAmbientAtmosphere();
+            tvHorrorStatusText.setText("THE ROPE SNAPPED. THEY ARE FREE.");
+            tvHorrorStatusText.setTextColor(Color.WHITE);
+            AnimationHelper.heartbeatPulse(tvHorrorStatusText, 1.1f);
             
-            int baseScore = difficulty.equals("EASY") ? 100 : (difficulty.equals("INTERMEDIATE") ? 250 : 500);
+            String normDiff = GameStatsRepository.normalizeDifficulty(difficulty);
+            int baseScore = normDiff.equals("EASY") ? 100 : (normDiff.equals("HARD") ? 500 : 250);
             int accuracyBonus = attemptsLeft * 30;
             int timeBonus = mode.equals("TIMER") ? (int)(timeRemainingMillis / 1000) * 15 : 0;
             score = baseScore + accuracyBonus + timeBonus;
-            
-            prefs.updateStats(prefs.getCurrentUser(), score, true, difficulty);
+
+            // Authoritative, transaction-safe local persistence
+            gameStatsRepo.recordGameResult(gameId, category, normDiff, mode, true, score, isDailyChallenge, dailyDate);
             
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 soundManager.playVictorySound();
                 Intent intent = new Intent(GameActivity.this, ResultActivity.class);
+                intent.putExtra("GAME_ID", gameId);
                 intent.putExtra("WON", true);
                 intent.putExtra("WORD", targetWord);
                 intent.putExtra("SCORE", score);
                 intent.putExtra("BASE", baseScore);
                 intent.putExtra("ACCURACY", accuracyBonus);
                 intent.putExtra("TIME_BONUS", timeBonus);
+                intent.putExtra("CATEGORY", category);
+                intent.putExtra("DIFFICULTY", normDiff);
+                intent.putExtra("IS_DAILY", isDailyChallenge);
                 startActivity(intent);
                 finish();
-            }, 1000);
+            }, 1200);
         }
     }
 
@@ -312,8 +374,14 @@ public class GameActivity extends AppCompatActivity {
     private void triggerFailure(String reason) {
         isGameOver = true;
         if (gameTimer != null) gameTimer.cancel();
+
+        for (int i = 0; i < glAlphabetKeyboard.getChildCount(); i++) {
+            glAlphabetKeyboard.getChildAt(i).setEnabled(false);
+        }
         
-        prefs.updateStats(prefs.getCurrentUser(), 0, false, difficulty);
+        String normDiff = GameStatsRepository.normalizeDifficulty(difficulty);
+        // Authoritative, transaction-safe local persistence
+        gameStatsRepo.recordGameResult(gameId, category, normDiff, mode, false, 0, isDailyChallenge, dailyDate);
         soundManager.stopAmbientAtmosphere();
         
         glAlphabetKeyboard.setVisibility(View.INVISIBLE);
@@ -330,19 +398,43 @@ public class GameActivity extends AppCompatActivity {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             soundManager.playFailureSound();
             
-            // Violent visual feedback of "Death" customized by difficulty
-            AnimationHelper.creatureDeathSequence(horrorFrame, gameFlickerOverlay, tvHorrorStatusText, difficulty, 3500, () -> {
-                // Transition to ResultActivity for restart/home options
+            AnimationHelper.creatureDeathSequence(horrorFrame, gameFlickerOverlay, tvHorrorStatusText, normDiff, 3500, () -> {
                 Intent intent = new Intent(GameActivity.this, ResultActivity.class);
+                intent.putExtra("GAME_ID", gameId);
                 intent.putExtra("WON", false);
                 intent.putExtra("WORD", targetWord);
                 intent.putExtra("REASON", reason);
-                intent.putExtra("DIFFICULTY", difficulty);
+                intent.putExtra("DIFFICULTY", normDiff);
+                intent.putExtra("CATEGORY", category);
+                intent.putExtra("IS_DAILY", isDailyChallenge);
                 startActivity(intent);
                 finish();
                 overridePendingTransition(0, 0);
             });
         }, 1500);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            AnimationHelper.enableImmersiveSticky(this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AnimationHelper.enableImmersiveSticky(this);
+        if (!isGameOver && attemptsLeft > 0) {
+            soundManager.startAmbientAtmosphere();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        soundManager.stopAmbientAtmosphere();
     }
 
     @Override

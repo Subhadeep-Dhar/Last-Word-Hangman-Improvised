@@ -15,9 +15,11 @@ import java.util.Random;
 public class HangmanView extends View {
     private Paint bloodPaint;
     private Paint spatterPaint;
+    private Paint freedPaint;
     private int mistakes = 0;
     private String difficulty = "EASY";
     private float timeOffset = 0;
+    private boolean isFreed = false;
     private List<Spatter> spatters = new ArrayList<>();
     private Random random = new Random();
 
@@ -91,6 +93,15 @@ public class HangmanView extends View {
         spatterPaint.setAntiAlias(true);
         spatterPaint.setAlpha(204); // 0.8 opacity
         spatterPaint.setShadowLayer(12f, 0f, 0f, Color.RED);
+
+        freedPaint = new Paint();
+        freedPaint.setColor(Color.parseColor("#F5F5F5")); // Relieved pale white with faint aura
+        freedPaint.setStyle(Paint.Style.STROKE);
+        freedPaint.setStrokeWidth(12f);
+        freedPaint.setStrokeCap(Paint.Cap.ROUND);
+        freedPaint.setStrokeJoin(Paint.Join.ROUND);
+        freedPaint.setAntiAlias(true);
+        freedPaint.setShadowLayer(18f, 0f, 0f, Color.parseColor("#E60000"));
     }
 
     public void setDifficulty(String diff) {
@@ -98,8 +109,24 @@ public class HangmanView extends View {
         invalidate();
     }
 
+    public void setFreed(boolean freed) {
+        this.isFreed = freed;
+        invalidate();
+    }
+
+    public boolean isFreed() {
+        return this.isFreed;
+    }
+
+    public void resetState() {
+        this.mistakes = 0;
+        this.isFreed = false;
+        this.spatters.clear();
+        invalidate();
+    }
+
     public void setMistakes(int mistakes) {
-        if (mistakes > this.mistakes && mistakes <= 6) {
+        if (!isFreed && mistakes > this.mistakes && mistakes <= 6) {
             // Generate realistic blood spatters using Path
             int numSpatters = 3 + random.nextInt(4);
             for (int i = 0; i < numSpatters; i++) {
@@ -120,14 +147,14 @@ public class HangmanView extends View {
 
         timeOffset += 0.2f;
         float twitch = 0;
-        if (mistakes > 0 && mistakes < 6) {
+        if (!isFreed && mistakes > 0 && mistakes < 6) {
             twitch = (float) Math.sin(timeOffset) * (mistakes * 1.5f); // Oscillating twitch based on pain
         }
 
         int width = getWidth();
         int height = getHeight();
 
-        // Draw Scaffold base, pole, top beam, and rope (Always present)
+        // Draw Scaffold base, pole, top beam
         float padding = 40f;
         float scaffoldBaseY = height - padding;
         float scaffoldTopY = padding;
@@ -139,27 +166,82 @@ public class HangmanView extends View {
         canvas.drawLine(scaffoldLeftX, scaffoldBaseY, scaffoldRightX, scaffoldBaseY, bloodPaint); // Base
         canvas.drawLine(scaffoldLeftX + 40f, scaffoldBaseY, scaffoldLeftX + 40f, scaffoldTopY, bloodPaint); // Pole
         canvas.drawLine(scaffoldLeftX + 40f, scaffoldTopY, ropeX, scaffoldTopY, bloodPaint); // Top Beam
-        canvas.drawLine(ropeX, scaffoldTopY, ropeX, ropeBottomY, bloodPaint); // Rope
 
-        // Draw spatters
+        // Draw spatters if any
         for (Spatter s : spatters) {
             canvas.save();
             canvas.translate(0, s.yOffset);
             canvas.drawPath(s.path, spatterPaint);
             canvas.restore();
-            s.yOffset += 0.3f; // Slower, thicker dripping effect
+            if (!isFreed) {
+                s.yOffset += 0.3f; // Slower, thicker dripping effect
+            }
         }
 
-        if ("HARD".equals(difficulty)) {
-            drawChild(canvas, ropeX, ropeBottomY, twitch);
+        if (isFreed) {
+            // ROPE IS CUT / SEVERED!
+            canvas.drawLine(ropeX, scaffoldTopY, ropeX, scaffoldTopY + 25f, bloodPaint);
+            canvas.drawLine(ropeX, scaffoldTopY + 25f, ropeX - 6f, scaffoldTopY + 36f, bloodPaint);
+            canvas.drawLine(ropeX, scaffoldTopY + 25f, ropeX + 6f, scaffoldTopY + 36f, bloodPaint);
+
+            // Severed noose fragment fallen on platform
+            canvas.drawLine(ropeX + 60f, scaffoldBaseY - 2f, ropeX + 85f, scaffoldBaseY - 12f, bloodPaint);
+            canvas.drawCircle(ropeX + 90f, scaffoldBaseY - 12f, 8f, bloodPaint);
+
+            // The character is standing free on the platform (no longer hanging)
+            float freedX = ropeX + 15f;
+            if ("HARD".equals(difficulty)) {
+                drawFreedChild(canvas, freedX, scaffoldBaseY);
+            } else {
+                drawFreedAdult(canvas, freedX, scaffoldBaseY);
+            }
         } else {
-            drawAdult(canvas, ropeX, ropeBottomY, twitch); // Use standard hangman for both adult and animal
-        }
+            // Normal hanging rope
+            canvas.drawLine(ropeX, scaffoldTopY, ropeX, ropeBottomY, bloodPaint);
 
-        // Loop animation if suffering (but not fully dead yet)
-        if (mistakes > 0 && mistakes < 6) {
-            postInvalidateDelayed(30);
+            if ("HARD".equals(difficulty)) {
+                drawChild(canvas, ropeX, ropeBottomY, twitch);
+            } else {
+                drawAdult(canvas, ropeX, ropeBottomY, twitch);
+            }
+
+            // Loop animation if suffering (but not fully dead yet)
+            if (mistakes > 0 && mistakes < 6) {
+                postInvalidateDelayed(30);
+            }
         }
+    }
+
+    private void drawFreedAdult(Canvas canvas, float charX, float groundY) {
+        // Legs firmly planted on platform
+        canvas.drawLine(charX, groundY - 70f, charX - 25f, groundY, freedPaint);
+        canvas.drawLine(charX, groundY - 70f, charX + 25f, groundY, freedPaint);
+
+        // Body upright
+        canvas.drawLine(charX, groundY - 70f, charX, groundY - 150f, freedPaint);
+
+        // Arms raised slightly in relief / freedom
+        canvas.drawLine(charX, groundY - 135f, charX - 42f, groundY - 165f, freedPaint);
+        canvas.drawLine(charX, groundY - 135f, charX + 42f, groundY - 165f, freedPaint);
+
+        // Head looking forward, clear of the noose
+        canvas.drawCircle(charX, groundY - 175f, 25f, freedPaint);
+    }
+
+    private void drawFreedChild(Canvas canvas, float charX, float groundY) {
+        // Legs planted on platform
+        canvas.drawLine(charX, groundY - 45f, charX - 18f, groundY, freedPaint);
+        canvas.drawLine(charX, groundY - 45f, charX + 18f, groundY, freedPaint);
+
+        // Body upright
+        canvas.drawLine(charX, groundY - 45f, charX, groundY - 100f, freedPaint);
+
+        // Arms reached out in relief
+        canvas.drawLine(charX, groundY - 90f, charX - 30f, groundY - 115f, freedPaint);
+        canvas.drawLine(charX, groundY - 90f, charX + 30f, groundY - 115f, freedPaint);
+
+        // Head safe and free
+        canvas.drawCircle(charX, groundY - 120f, 18f, freedPaint);
     }
 
     private void drawAdult(Canvas canvas, float ropeX, float ropeBottomY, float twitch) {
@@ -196,70 +278,5 @@ public class HangmanView extends View {
         float legEndY = bodyBottomY + 45f;
         if (mistakes >= 5) canvas.drawLine(ropeX + twitch, bodyBottomY, ropeX - 25f + twitch, legEndY, bloodPaint);
         if (mistakes >= 6) canvas.drawLine(ropeX + twitch, bodyBottomY, ropeX + 25f - twitch, legEndY, bloodPaint);
-    }
-
-    private void drawAnimal(Canvas canvas, float ropeX, float ropeBottomY, float twitch) {
-        Path animalPath = new Path();
-        float neckY = ropeBottomY;
-        float bodyCenterY = neckY + 40f;
-        float bodyBottomY = neckY + 90f;
-        
-        // Stage 1: Head (Hanging lifelessly down and slightly angled)
-        if (mistakes >= 1) {
-            animalPath.moveTo(ropeX, neckY); // tied at neck
-            animalPath.cubicTo(ropeX - 10, neckY + 10, ropeX - 25, neckY + 25, ropeX - 20, neckY + 40); // snout hanging down
-            animalPath.quadTo(ropeX, neckY + 45, ropeX + 15, neckY + 30); // jaw
-            animalPath.quadTo(ropeX + 10, neckY + 15, ropeX, neckY); // back of head
-        }
-
-        // Stage 2: Spine/Torso (Vertical hanging limp body)
-        if (mistakes >= 2) {
-            animalPath.moveTo(ropeX, neckY + 10);
-            animalPath.cubicTo(ropeX - 15, bodyCenterY, ropeX + 5, bodyBottomY - 20, ropeX - 5, bodyBottomY); 
-        }
-
-        // Stage 3: Left Front Leg
-        if (mistakes >= 3) {
-            float shoulderY = neckY + 25f;
-            animalPath.moveTo(ropeX - 10, shoulderY);
-            animalPath.quadTo(ropeX - 20, shoulderY + 20, ropeX - 15, shoulderY + 50); // Left front leg
-        }
-
-        // Stage 4: Right Front Leg
-        if (mistakes >= 4) {
-            float shoulderY = neckY + 25f;
-            animalPath.moveTo(ropeX + 5, shoulderY);
-            animalPath.quadTo(ropeX + 15, shoulderY + 25, ropeX + 10, shoulderY + 45); // Right front leg
-        }
-
-        // Stage 5: Left Back Leg
-        if (mistakes >= 5) {
-            float rumpY = bodyBottomY - 10f;
-            animalPath.moveTo(ropeX - 5, rumpY);
-            animalPath.quadTo(ropeX - 15, rumpY + 30, ropeX - 10, rumpY + 60); // Left back leg
-        }
-
-        // Stage 6: Right Back Leg, Tail, Ears
-        if (mistakes >= 6) {
-            float rumpY = bodyBottomY - 10f;
-            animalPath.moveTo(ropeX + 5, rumpY - 5);
-            animalPath.quadTo(ropeX + 15, rumpY + 25, ropeX + 10, rumpY + 50); // Right back leg
-            
-            // Tail (Hanging limp, straight down)
-            animalPath.moveTo(ropeX - 2, bodyBottomY);
-            animalPath.quadTo(ropeX, bodyBottomY + 20, ropeX + 5, bodyBottomY + 40);
-            
-            // Ears (Drooping downwards)
-            animalPath.moveTo(ropeX + 5, neckY + 10);
-            animalPath.quadTo(ropeX + 25, neckY + 15, ropeX + 20, neckY + 30);
-            animalPath.moveTo(ropeX - 5, neckY + 10);
-            animalPath.quadTo(ropeX - 20, neckY + 15, ropeX - 15, neckY + 30);
-        }
-
-        // Apply twitch offset
-        canvas.save();
-        canvas.translate(twitch, twitch * 0.2f);
-        canvas.drawPath(animalPath, bloodPaint);
-        canvas.restore();
     }
 }

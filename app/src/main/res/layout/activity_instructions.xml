@@ -49,9 +49,9 @@
             <TextView android:letterSpacing="0.15" android:fontFamily="@font/ghastly_panic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1. You are here to rescue a trapped essence. Choose your destination target wisely: Animals, Objects, or Celebrities.\n\n2. The levels determine the sacrifice risk. Easy targets animals, Intermediate targets an unknown adult, and Hard invokes a silent psychological nursery nightmare where an infant's presence is threatened.\n\n3. Select a ritual mode. Classic allows you to guess carefully through errors. Timer Mode accelerates reality, imposing an unyielding time limit before permanent failure is cast.\n\n4. Select keys from the grid. Correct choices manifest hidden words. Wrong selections immediately invoke environmental decay: screen flickers, darkness compression, and psychological dread markers advance.\n\n5. If your attempts disintegrate to 0 or the countdown hits absolute null, the connection severs permanently. You will have caused another sacrifice (Kill)."
+                android:text="1. You are here to rescue a trapped essence. Choose your destination target wisely: Animals, Horror Movies, or Celebrities.\n\n2. The levels determine sacrifice risk and assistance. Easy provides cryptic clues to assist your guesses. Medium and Hard force you into total psychological darkness without clues.\n\n3. Daily Challenge summons a unique, medium-difficulty tether once per local day. Each daily outcome is etched permanently into your record once.\n\n4. Select a ritual mode. Classic allows you to guess carefully through errors. Timer Mode accelerates reality, imposing an unyielding time limit before permanent failure is cast.\n\n5. Select keys from the grid. Correct choices reveal letters; completing the word severs the rope to set them free. Wrong selections or running out of time seal their doom and tally a Kill.\n\n6. The Soul Registry preserves your total rituals, saved lives, kills, resonance scores, and rescue streaks offline on this device."
                 android:textColor="@color/pale_white"
-                android:textSize="32sp"
+                android:textSize="30sp"
                 android:lineSpacingMultiplier="1.2"/>
         </LinearLayout>
     </ScrollView>

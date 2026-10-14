@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.lastword.utils.AnimationHelper;
 import com.example.lastword.utils.SoundManager;
 
 public class GameSetupActivity extends AppCompatActivity {
@@ -18,6 +19,7 @@ public class GameSetupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_setup);
 
         soundManager = new SoundManager(this);
+        AnimationHelper.enableImmersiveSticky(this);
 
         rgCategory = findViewById(R.id.rgCategory);
         rgDifficulty = findViewById(R.id.rgDifficulty);
@@ -29,8 +31,8 @@ public class GameSetupActivity extends AppCompatActivity {
 
             String category = "ANIMALS";
             int catChecked = rgCategory.getCheckedRadioButtonId();
-            if (catChecked == R.id.rbObjects) {
-                category = "OBJECTS";
+            if (catChecked == R.id.rbHorrorMovies) {
+                category = "HORROR_MOVIES";
             } else if (catChecked == R.id.rbCelebrities) {
                 category = "CELEBRITIES";
             }
@@ -38,7 +40,7 @@ public class GameSetupActivity extends AppCompatActivity {
             String difficulty = "EASY";
             int diffChecked = rgDifficulty.getCheckedRadioButtonId();
             if (diffChecked == R.id.rbIntermediate) {
-                difficulty = "INTERMEDIATE";
+                difficulty = "MEDIUM";
             } else if (diffChecked == R.id.rbHard) {
                 difficulty = "HARD";
             }
@@ -56,5 +58,32 @@ public class GameSetupActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            AnimationHelper.enableImmersiveSticky(this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AnimationHelper.enableImmersiveSticky(this);
+        soundManager.startMenuAtmosphere();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        soundManager.stopAmbientAtmosphere();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        soundManager.stopAmbientAtmosphere();
     }
 }
